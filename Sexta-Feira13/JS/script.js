@@ -153,14 +153,14 @@ const scenes = {
     ]
   },
   gas_station: {
-    chapter: "PRÓLOGO", title: "Sombra no posto", text: "A oficina cheira a combustível velho. Enquanto você procura uma saída, ouve passos pesados do lado de fora.\n\nUm vulto passa pela janela. Não é hora de ficar parado.",
+    chapter: "PRÓLOGO", title: "Sombra no posto", image: "assets/images/gas_station.jpg", text: "A oficina cheira a combustível velho. Enquanto você procura uma saída, ouve passos pesados do lado de fora.\n\nUm vulto passa pela janela. Não é hora de ficar parado.",
     choices: [
       { text: "Forçar o porta-malas do carro abandonado", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, bonus: gameState.stamina >= 3 ? 1 : 0, statusMsg: "FORÇANDO A TRAVA...", onSuccess: () => { addItem("Pé de Cabra"); goToScene("arrival"); }, onFail: () => { useStamina(1); goToScene("arrival"); } }) },
       { text: "Sair em silêncio e seguir para os portões", tag: "FURTIVIDADE", action: () => goToScene("arrival") }
     ]
   },
   arrival: {
-    chapter: "CAPÍTULO I", title: "Os portões de Crystal Lake", text: "Os portões estão abertos. A corrente foi cortada recentemente. No pátio existem cabanas, uma trilha para a torre de vigia e outra para o lago.\n\nVocê escuta um barulho metálico vindo de uma das cabanas.",
+    chapter: "CAPÍTULO I", title: "Os portões de Crystal Lake", image: "assets/images/camp_gates.jpg", text: "Os portões estão abertos. A corrente foi cortada recentemente. No pátio existem cabanas, uma trilha para a torre de vigia e outra para o lago.\n\nVocê escuta um barulho metálico vindo de uma das cabanas.",
     choices: [
       { reqItem: "Pé de Cabra", text: "Usar o Pé de Cabra para entrar na cabana principal", tag: "ITEM", action: () => goToScene("cabin_inside") },
       { text: "Entrar na cabana pela força", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, statusMsg: "FORÇANDO A PORTA...", onSuccess: () => goToScene("cabin_inside"), onFail: () => { takeDamage(2); recoverStamina(1); goToScene("arrival"); } }) },
@@ -169,23 +169,23 @@ const scenes = {
     ]
   },
   cabin_inside: {
-    chapter: "CAPÍTULO II", title: "O despertar", text: "Dentro da cabana, tudo parece abandonado. Sobre uma prateleira há um Kit Médico. Então a porta dos fundos se rompe.\n\nUma figura enorme surge no vão: máscara de hóquei, roupa encharcada e um facão. Jason está diante de você.\n\nVocê tem poucos segundos para decidir.",
+    chapter: "CAPÍTULO II", title: "O despertar", image: "assets/images/cabin_inside.jpg", text: "Dentro da cabana, tudo parece abandonado. Sobre uma prateleira há um Kit Médico. Então a porta dos fundos se rompe.\n\nUma figura enorme surge no vão: máscara de hóquei, roupa encharcada e um facão. Jason está diante de você.\n\nVocê tem poucos segundos para decidir.",
     choices: [
-      { text: "Pegar o Kit Médico e correr", action: () => { addItem("Kit Médico"); goToScene("forest_chase"); } },
+      { showIf: () => !hasItem("Kit Médico"), text: "Pegar o Kit Médico e correr", action: () => { if (addItem("Kit Médico")) goToScene("forest_chase"); } },
       { reqItem: "Lanterna", text: "Apontar a Lanterna e ganhar tempo para fugir", tag: "ITEM", action: () => { removeItem("Lanterna"); goToScene("forest_chase"); } },
       { text: "Subir para o sótão", action: () => goToScene("cabin_attic") },
       { text: "Tentar escapar pela porta da frente", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "ESCAPANDO DA CABANA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
     ]
   },
   cabin_attic: {
-    chapter: "CAPÍTULO II", title: "O sótão", text: "Você se esconde no sótão. Caixas antigas ocupam o espaço. Uma delas contém um sinalizador de emergência.\n\nAs tábuas abaixo começam a ranger. Jason está subindo.",
+    chapter: "CAPÍTULO II", title: "O sótão", image: "assets/images/cabin_attic.jpg", text: "Você se esconde no sótão. Caixas antigas ocupam o espaço. Uma delas contém um sinalizador de emergência.\n\nAs tábuas abaixo começam a ranger. Jason está subindo.",
     choices: [
-      { text: "Abrir a caixa metálica", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 3, statusMsg: "ABRINDO O FECHO...", onSuccess: () => { addItem("Sinalizador"); goToScene("forest_chase"); }, onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) },
+      { showIf: () => !hasItem("Sinalizador"), text: "Abrir a caixa metálica", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 3, statusMsg: "ABRINDO O FECHO...", onSuccess: () => { addItem("Sinalizador"); goToScene("forest_chase"); }, onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) },
       { text: "Saltar pela janela para a mata", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "SALTANDO PELA JANELA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
     ]
   },
   forest_chase: {
-    chapter: "CAPÍTULO III", title: "A perseguição", text: "Você atravessa a floresta sob a chuva. Os passos atrás de você não diminuem.\n\nÀ frente, três caminhos oferecem uma chance de fuga: a garagem, a torre de vigia e o cais.",
+    chapter: "CAPÍTULO III", title: "A perseguição", image: "assets/images/forest_chase.jpg", text: "Você atravessa a floresta sob a chuva. Os passos atrás de você não diminuem.\n\nÀ frente, três caminhos oferecem uma chance de fuga: a garagem, a torre de vigia e o cais.",
     choices: [
       { text: "Correr para a garagem", action: () => goToScene("garage_scene") },
       { text: "Subir até a torre de vigia", action: () => goToScene("watchtower_path") },
@@ -193,11 +193,14 @@ const scenes = {
     ]
   },
   garage_scene: {
-    chapter: "CAPÍTULO IV", title: "O galpão dos veículos", text: "A garagem está escura. Uma Pick-Up de resgate ainda parece utilizável, mas a chave não está no contato.\n\nJason se aproxima pelo corredor. Você precisa decidir se procura a chave ou tenta ligar o veículo por conta própria.",
+    chapter: "CAPÍTULO IV", title: "O galpão dos veículos", image: "assets/images/garage.jpg", text: () => hasItem("Chave da Pick-Up") ? "A Pick-Up de resgate ainda está na garagem. Você encontrou a chave no quadro da oficina.\n\nJason está cada vez mais perto. Agora basta ligar o veículo e fugir." : "A garagem está escura. Uma Pick-Up de resgate ainda parece utilizável, mas a chave não está no contato.\n\nJason se aproxima pelo corredor. Você precisa decidir se procura a chave ou tenta ligar o veículo por conta própria.",
     choices: [
       { reqItem: "Chave da Pick-Up", text: "Usar a chave e ligar a Pick-Up", tag: "ITEM", action: () => goToScene("ending_good_car") },
-      { text: "Procurar a chave no quadro da oficina", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "PROCURANDO A CHAVE...", onSuccess: () => { addItem("Chave da Pick-Up"); goToScene("garage_scene"); }, onFail: () => { useStamina(1); goToScene("garage_escape"); } }) },
-      { text: "Tentar ligar a Pick-Up sem a chave", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 5, statusMsg: "TENTANDO DAR PARTIDA...", onSuccess: () => goToScene("ending_good_car"), onFail: () => { takeDamage(2); goToScene("garage_escape"); } }) }
+      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Procurar a chave no quadro da oficina", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "PROCURANDO A CHAVE...", onSuccess: () => {
+          if (addItem("Chave da Pick-Up")) goToScene("garage_scene");
+          else goToScene("garage_escape");
+        }, onFail: () => { useStamina(1); goToScene("garage_escape"); } }) },
+      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Tentar ligar a Pick-Up sem a chave", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 5, statusMsg: "TENTANDO DAR PARTIDA...", onSuccess: () => goToScene("ending_good_car"), onFail: () => { takeDamage(2); goToScene("garage_escape"); } }) }
     ]
   },
   garage_escape: {
@@ -208,7 +211,7 @@ const scenes = {
     ]
   },
   watchtower_path: {
-    chapter: "CAPÍTULO IV", title: "A torre de vigia", text: "No alto da torre existe um rádio de emergência. A energia está instável, mas a antena ainda aponta para a estrada estadual.\n\nUm sinalizador também poderia chamar atenção de quem estiver passando pela região.",
+    chapter: "CAPÍTULO IV", title: "A torre de vigia", image: "assets/images/watchtower.jpg", text: "No alto da torre existe um rádio de emergência. A energia está instável, mas a antena ainda aponta para a estrada estadual.\n\nUm sinalizador também poderia chamar atenção de quem estiver passando pela região.",
     choices: [
       { text: "Tentar transmitir um pedido de socorro", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "BUSCANDO A FREQUÊNCIA...", onSuccess: () => goToScene("ending_heroic"), onFail: () => { takeDamage(1); goToScene("tower_escape"); } }) },
       { reqItem: "Sinalizador", text: "Disparar o sinalizador para a estrada", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
@@ -223,7 +226,7 @@ const scenes = {
     ]
   },
   lake_trail: {
-    chapter: "CAPÍTULO IV", title: "As águas de Crystal Lake", text: "O cais está escorregadio e a chuva transforma o lago em uma massa escura. Uma pequena lancha de manutenção está presa à margem.\n\nVocê ouve passos atrás de si. Não há muito tempo.",
+    chapter: "CAPÍTULO IV", title: "As águas de Crystal Lake", image: "assets/images/lake.jpg", text: "O cais está escorregadio e a chuva transforma o lago em uma massa escura. Uma pequena lancha de manutenção está presa à margem.\n\nVocê ouve passos atrás de si. Não há muito tempo.",
     choices: [
       { text: "Tentar ligar o motor da lancha", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "PUXANDO O MOTOR...", onSuccess: () => goToScene("ending_good_boat"), onFail: () => { takeDamage(2); goToScene("lake_escape"); } }) },
       { reqItem: "Sinalizador", text: "Usar o sinalizador para chamar ajuda", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
@@ -237,10 +240,10 @@ const scenes = {
       { text: "Correr para a garagem", action: () => goToScene("garage_escape") }
     ]
   },
-  ending_death: { chapter: "FIM DE JOGO", title: "Crystal Lake venceu", text: "A perseguição termina na escuridão. Crystal Lake guarda mais um segredo, e sua história chega ao fim.\n\nVocê não sobreviveu desta vez — mas talvez outra escolha mude o resultado.", ending: true, choices: [{ text: "Tentar novamente", action: () => restartGame() }] },
-  ending_good_car: { chapter: "FINAL", title: "Fuga pela rodovia", text: "A Pick-Up finalmente pega. Você atravessa os portões e acelera pela estrada, deixando Crystal Lake para trás.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
-  ending_good_boat: { chapter: "FINAL", title: "Além das águas", text: "O motor da lancha responde. Você cruza o lago e alcança a margem oposta antes que a perseguição possa continuar.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
-  ending_heroic: { chapter: "FINAL", title: "Resgate estadual", text: "Seu pedido de socorro é ouvido. Sirenes aparecem na estrada e a equipe de resgate chega ao acampamento.\n\nVocê sobreviveu — e Crystal Lake terá de explicar o que aconteceu aqui.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] }
+  ending_death: { chapter: "FIM DE JOGO", image: "assets/images/ending_death.jpg", title: "Crystal Lake venceu", text: "A perseguição termina na escuridão. Crystal Lake guarda mais um segredo, e sua história chega ao fim.\n\nVocê não sobreviveu desta vez — mas talvez outra escolha mude o resultado.", ending: true, choices: [{ text: "Tentar novamente", action: () => restartGame() }] },
+  ending_good_car: { chapter: "FINAL", image: "assets/images/ending_car.jpg", title: "Fuga pela rodovia", text: "A Pick-Up finalmente pega. Você atravessa os portões e acelera pela estrada, deixando Crystal Lake para trás.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
+  ending_good_boat: { chapter: "FINAL", image: "assets/images/ending_boat.jpg", title: "Além das águas", text: "O motor da lancha responde. Você cruza o lago e alcança a margem oposta antes que a perseguição possa continuar.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
+  ending_heroic: { chapter: "FINAL", image: "assets/images/ending_rescue.jpg", title: "Resgate estadual", text: "Seu pedido de socorro é ouvido. Sirenes aparecem na estrada e a equipe de resgate chega ao acampamento.\n\nVocê sobreviveu — e Crystal Lake terá de explicar o que aconteceu aqui.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] }
 };
 
 function goToScene(sceneKey) {
@@ -252,7 +255,7 @@ function goToScene(sceneKey) {
 
   document.getElementById("chapter-badge").innerText = scene.chapter;
   document.getElementById("scene-title").innerText = scene.title;
-  document.getElementById("scene-text").innerText = scene.text;
+  document.getElementById("scene-text").innerText = typeof scene.text === "function" ? scene.text() : scene.text;
 
   const img = document.getElementById("scene-image");
   const placeholder = document.getElementById("image-placeholder");
@@ -268,7 +271,7 @@ function goToScene(sceneKey) {
 
   const container = document.getElementById("choices-container");
   container.innerHTML = "";
-  scene.choices?.forEach((choice, index) => {
+  scene.choices?.filter(choice => !choice.showIf || choice.showIf()).forEach((choice, index) => {
     const btn = document.createElement("button");
     btn.className = "btn-choice";
     const disabled = Boolean(choice.reqItem && !hasItem(choice.reqItem));
