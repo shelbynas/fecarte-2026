@@ -164,6 +164,17 @@
     flex-direction: column;
     justify-content: space-between;
     background-color: #121216;
+    cursor: pointer;
+  }
+
+  .story-panel::after {
+    content: "▶ clique para pular a escrita";
+    display: block;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: #444455;
+    margin-top: -18px;
   }
   
   .chapter-title {

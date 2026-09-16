@@ -7,7 +7,7 @@ const storyData = {
   
   Ele usa máscaras assustadoras. Oferece balões pretos para os meninos que encontra. E ninguém que entrou na van dele jamais voltou.
   
-  Você é Finney Shaw, 13 anos. Você inteligente — e isso pode ser a única coisa que vai te salvar. Enquanto isso, sua irmã Gwen tem sonhos estranhos que mostram coisas que ainda não aconteceram. E esta noite ela sonhou com você num porão escuro, com um telefone preto tocando na parede.
+  Você é Finney Shaw, 13 anos. Você é esperto — e isso pode ser a única coisa que vai te salvar. Enquanto isso, sua irmã Gwen tem sonhos estranhos que mostram coisas que ainda não aconteceram. E esta noite ela sonhou com você num porão escuro, com um telefone preto tocando na parede.
   
   O telefone vai tocar. E do outro lado da linha, os mortos vão falar.`,
       isRinging: false,
@@ -34,7 +34,7 @@ const storyData = {
     cap2a: {
       id: "cap2a",
       titulo: "📖 CAPÍTULO 2A — A VOZ DO OUTRO LADO",
-      texto: `Sua mão treme ao aproximar o fone do ouvido. Uma voz jovem e ecoada fala:
+      texto: `Sua mão treme ao aproximar o fone do ouvido. Uma voz de garoto, meio distorcida, fala:
   "Meu nome é Robin. Robin Arellano. Eu já estive onde você está agora. O Grabber vai querer brincar com você, mas você pode lutar."
   
   "Como? A porta está trancada!", você responde.
@@ -65,7 +65,7 @@ const storyData = {
     cap2c: {
       id: "cap2c",
       titulo: "📖 CAPÍTULO 2C — GRITANDO POR AJUDA",
-      texto: `Você grita por socorro até a garganta doer. O porão é totalmente à prova de som. Ninguém lá fora pode te ouvir.
+      texto: `Você grita por socorro até a garganta doer. Mas o porão não deixa o som escapar. Ninguém lá fora pode te ouvir.
   O telefone dá uma pausa e volta a tocar de novo, ainda mais alto!`,
       isRinging: true,
       botoes: [
@@ -108,7 +108,8 @@ const storyData = {
       isRinging: false,
       botoes: [
         { texto: "🔘 [Fingir que está dormindo na cama]", destino: "cap4d" },
-        { texto: "🔘 [Ficar atrás da porta pronto para atacar]", destino: "cap4e" },
+        { texto: "🔘 [Ficar atrás da porta pronto para atacar com o vidro]", destino: "cap4e", reqItem: "Pedaço de Vidro Afiado" },
+        { texto: "🔘 [Ficar atrás da porta e tentar surpreendê-lo desarmado]", destino: "cap4e2" },
         { texto: "🔘 [Atender o telefone que voltou a tocar]", destino: "cap4a" }
       ]
     },
@@ -152,12 +153,13 @@ const storyData = {
   
     cap4a: {
       id: "cap4a",
-      titulo: "📖 CAPÍTULO 4A — O TELEFONE E O VIDRO",
+      titulo: "📖 CAPÍTULO 4A — O TELEFONE",
       texto: `Outra voz de garoto avisa: "Aquele telefone é uma porta. Nós estamos do outro lado. O Grabber acha que o telefone é inútil. Use isso a seu favor!"`,
       isRinging: false,
       botoes: [
-        { texto: "🔘 [Cortar a corda do telefone agora]", destino: "cap5d" },
-        { texto: "🔘 [Guardar o vidro e esperar o Grabber]", destino: "cap4d" }
+        { texto: "🔘 [Usar o vidro para cortar a corda do telefone]", destino: "cap5d", reqItem: "Pedaço de Vidro Afiado" },
+        { texto: "🔘 [Guardar o vidro e esperar o Grabber]", destino: "cap4d", reqItem: "Pedaço de Vidro Afiado" },
+        { texto: "🔘 [Desligar e esperar o Grabber em silêncio]", destino: "cap4d" }
       ]
     },
   
@@ -170,14 +172,14 @@ const storyData = {
       botoes: [
         { texto: "🔘 [Mentir: 'Não ouvi nada']", destino: "cap5e" },
         { texto: "🔘 [Perguntar sobre as outras vítimas]", destino: "cap5f" },
-        { texto: "🔘 [Atacar com o vidro]", destino: "cap5g" }
+        { texto: "🔘 [Atacar com o vidro]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" }
       ]
     },
   
     cap4c: {
       id: "cap4c",
       titulo: "📖 CAPÍTULO 4C — CORTANDO A CORDA",
-      texto: `Você corta a corda do telefone com o vidro. O fone cai no chão. Agora o telefone está inutilizado.`,
+      texto: `Você corta a corda do telefone com o vidro. O fone cai no chão. Agora o telefone está quebrado.`,
       isRinging: false,
       botoes: [
         { texto: "🔘 [Usar o vidro para tentar forçar a fechadura]", destino: "cap5h" },
@@ -208,6 +210,17 @@ const storyData = {
       ]
     },
   
+    cap4e2: {
+      id: "cap4e2",
+      titulo: "📖 CAPÍTULO 4E — SEM ARMA",
+      texto: `Você se esconde atrás da porta, mas está desarmado. Quando o Grabber entra, você tenta agarrá-lo, mas ele é forte demais e te derruba no chão!`,
+      isRinging: true,
+      botoes: [
+        { texto: "🔘 [Levantar e atender o telefone]", destino: "cap4a" },
+        { texto: "🔘 [Ficar no chão sem forças]", destino: "cap5k" }
+      ]
+    },
+
     cap4f: {
       id: "cap4f",
       titulo: "📖 CAPÍTULO 4F — QUEBRANDO A JANELA",
@@ -429,7 +442,7 @@ const storyData = {
       isEnding: true,
       endingId: "6D",
       titulo: "💀 FINAL 6D — SEM ESPERANÇA (FINAL TRÁGICO)",
-      texto: `O medo consumiu sua vontade. Quando o Grabber volta, você não oferece resistência.
+      texto: `O medo tomou conta de você. Quando o Grabber volta, você não reage.
   
   FIM. A esperança foi perdida.`,
       botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
@@ -451,7 +464,7 @@ const storyData = {
       isEnding: true,
       endingId: "6F",
       titulo: "💀 FINAL 6F — IMPLORAR (FINAL TRÁGICO)",
-      texto: `Você implora por sua vida, mas o Grabber sorri por baixo da máscara afirmando que todos prometem mentiras.
+      texto: `Você implora por sua vida, mas o Grabber sorri por baixo da máscara e diz que todo mundo promete mentiras.
   
   FIM. Implorar não adiantou.`,
       botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
@@ -473,7 +486,7 @@ const storyData = {
       isEnding: true,
       endingId: "6H",
       titulo: "🏆 FINAL 6H — FINAL SOMBRIO",
-      texto: `No desespero do combate, você derrota o Grabber permanentemente com o vidro. A polícia chega e te resgata, mas o porão mudou você para sempre.
+      texto: `No desespero da luta, você derrota o Grabber de vez com o vidro. A polícia chega e te resgata, mas o porão mudou você para sempre.
   
   FIM. Sobreviver é apenas o começo.`,
       botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
@@ -506,7 +519,7 @@ const storyData = {
       isEnding: true,
       endingId: "6K",
       titulo: "🏆 FINAL 6K — ENCARAR",
-      texto: `Você encara o Grabber sem demonstrar medo. Surpreso com sua coragem, ele se retira deixando a porta aberta.
+      texto: `Você encara o Grabber sem mostrar medo. Surpreso com sua coragem, ele se afasta e deixa a porta aberta.
   
   FIM. Coragem diante do horror.`,
       botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
@@ -574,7 +587,7 @@ const storyData = {
       titulo: "🏆 FINAL 6Q — ESCONDER-SE (FUGA FURTIVA)",
       texto: `Você se esconde atrás do barril de metal. O Grabber passa direto e você pula a cerca para pedir socorro na casa vizinha!
   
-  FIM. Furtividade e inteligência!`,
+  FIM. Você foi esperto e se escondeu bem!`,
       botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
     }
   };

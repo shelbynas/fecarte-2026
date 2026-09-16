@@ -1,4 +1,12 @@
 class UIController {
+    constructor() {
+      this.typingInterval = null;
+      this.isTyping = false;
+      this.pendingCallback = null;
+      this.currentFullText = "";
+      this.currentTextEl = null;
+    }
+
     renderChapter(chapterNode, onChoiceClick) {
       document.getElementById("chapter-title").textContent = chapterNode.titulo;
   
@@ -37,19 +45,54 @@ class UIController {
       const textEl = document.getElementById("chapter-text");
       const buttonsEl = document.getElementById("choice-buttons");
       buttonsEl.innerHTML = "";
-  
+
+      // Se já existia uma escrita em andamento (ex: reiniciar o jogo no meio
+      // de uma frase), ela precisa ser cancelada antes de começar a nova.
+      // Sem isso, os dois intervalos escrevem ao mesmo tempo e as letras
+      // ficam bugadas/misturadas.
+      if (this.typingInterval) {
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+      }
+      this.pendingCallback = null;
+
       textEl.textContent = "";
+      this.currentFullText = fullText;
+      this.currentTextEl = textEl;
+      this.pendingCallback = callback;
+      this.isTyping = true;
+
       let i = 0;
-  
-      const interval = setInterval(() => {
+      this.typingInterval = setInterval(() => {
         if (i < fullText.length) {
           textEl.textContent += fullText.charAt(i);
           i++;
         } else {
-          clearInterval(interval);
-          if (callback) callback();
+          this.finishTyping();
         }
       }, 15);
+    }
+
+    // Termina a escrita instantaneamente (usado ao acabar o texto normalmente
+    // ou quando o jogador clica na tela para pular o efeito de digitação).
+    finishTyping() {
+      if (this.typingInterval) {
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+      }
+      if (this.currentTextEl) {
+        this.currentTextEl.textContent = this.currentFullText;
+      }
+      this.isTyping = false;
+      const callback = this.pendingCallback;
+      this.pendingCallback = null;
+      if (callback) callback();
+    }
+
+    skipTyping() {
+      if (this.isTyping) {
+        this.finishTyping();
+      }
     }
   
     renderButtons(botoes, onChoiceClick) {

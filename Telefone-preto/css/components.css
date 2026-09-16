@@ -114,17 +114,34 @@
   }
   
   .achievement-card {
-    background-color: #0a0a0d;
-    border: 1px solid #22222c;
-    padding: 12px;
+    background-color: #050506;
+    border: 1px solid #1a1a22;
+    padding: 14px;
     border-radius: 4px;
-    opacity: 0.5;
+    filter: grayscale(1);
+    opacity: 0.55;
+    text-align: center;
   }
-  
+
+  .achievement-card.locked .card-title {
+    color: #55555f;
+  }
+
   .achievement-card.unlocked {
     border-color: var(--text-green);
     background-color: #101a14;
+    filter: none;
     opacity: 1;
+  }
+
+  .card-icon {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  .achievement-card.locked .card-icon {
+    color: #33333c;
   }
   
   .card-code {

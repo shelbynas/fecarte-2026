@@ -35,5 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("audio-status").textContent = isAudioOn ? "SOM: ON" : "SOM: OFF";
     });
   
+    // Clicar na tela pula o efeito de digitação e mostra o texto inteiro na hora.
+    document.querySelector(".story-panel").addEventListener("click", () => {
+      uiController.skipTyping();
+    });
+
     loadChapter("prologo");
   });
