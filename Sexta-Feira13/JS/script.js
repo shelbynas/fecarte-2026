@@ -1,784 +1,319 @@
-/* ==========================================================================
-   ESTADO DO JOGADOR E GERENCIAMENTO DE INVENTÁRIO
-   ========================================================================== */
+/* ================================================================
+   VOCÊ SOBREVIVERIA? — CRYSTAL LAKE
+   Versão revisada: UX, progressão, finais e troféus persistentes.
+   ================================================================ */
+
+const ENDINGS = {
+  ending_death: { name: "Crystal Lake", description: "Descobriu o destino mais sombrio.", icon: "☠️" },
+  ending_good_car: { name: "Fuga pela Rodovia", description: "Escapou usando a velha Pick-Up.", icon: "🚙" },
+  ending_good_boat: { name: "Além das Águas", description: "Conseguiu atravessar o lago.", icon: "🚤" },
+  ending_heroic: { name: "Resgate Estadual", description: "Conseguiu pedir socorro.", icon: "📻" }
+};
+
 const gameState = {
-    hp: 10,
-    maxHp: 10,
-    stamina: 5,
-    maxStamina: 5,
-    inventory: [],
-    maxInventorySlots: 4,
-    currentScene: "prologue",
-    isRolling: false,
-    rollSpins: 0
+  hp: 10, maxHp: 10,
+  stamina: 5, maxStamina: 5,
+  inventory: [], maxInventorySlots: 4,
+  currentScene: "prologue",
+  decisions: 0,
+  isRolling: false,
+  visited: new Set()
 };
 
 const faceRotations = {
-    1: { x: 0, y: 0 },
-    2: { x: -90, y: 0 },
-    3: { x: 0, y: -90 },
-    4: { x: 0, y: 90 },
-    5: { x: 90, y: 0 },
-    6: { x: 0, y: 180 }
+  1: { x: 0, y: 0 },
+  2: { x: -90, y: 0 },
+  3: { x: 0, y: -90 },
+  4: { x: 0, y: 90 },
+  5: { x: 90, y: 0 },
+  6: { x: 0, y: 180 }
 };
 
-const TROPHY_STORAGE_KEY = "ff13_crystal_lake_trophies";
-
-const endingsMeta = {
-    ending_death:      { icon: "💀", kicker: "Fim de Jogo", name: "Não Sobreviveu",        desc: "Jason alcançou você antes do amanhecer." },
-    ending_good_car:    { icon: "🚙", kicker: "Final Bom",   name: "Fuga Pela Rodovia",      desc: "Escapou dirigindo a velha Pick-Up de resgate." },
-    ending_good_boat:   { icon: "🛶", kicker: "Final Bom",   name: "Além das Águas Escuras", desc: "Atravessou o lago em segurança até a outra margem." },
-    ending_heroic:      { icon: "🚓", kicker: "Final Bom",   name: "Resgate da Polícia",     desc: "Pediu socorro a tempo e foi resgatado." }
-};
-const ENDING_KEYS = Object.keys(endingsMeta);
-
-/* ==========================================================================
-   TROFÉUS (persistidos neste computador)
-   ========================================================================== */
-function loadTrophies() {
-    try {
-        const raw = localStorage.getItem(TROPHY_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : {};
-    } catch (e) {
-        return {};
-    }
+const trophyData = () => JSON.parse(localStorage.getItem("crystalLakeEndings") || "[]");
+function saveTrophy(sceneKey) {
+  const unlocked = trophyData();
+  if (ENDINGS[sceneKey] && !unlocked.includes(sceneKey)) {
+    unlocked.push(sceneKey);
+    localStorage.setItem("crystalLakeEndings", JSON.stringify(unlocked));
+    updateTrophyUI();
+    showMessage(`🏆 Novo final descoberto: ${ENDINGS[sceneKey].name}`);
+  }
 }
 
-function saveTrophies(data) {
-    try {
-        localStorage.setItem(TROPHY_STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {
-        /* armazenamento indisponível — segue o jogo normalmente */
-    }
+function updateTrophyUI() {
+  const unlocked = trophyData();
+  const count = unlocked.length;
+  document.getElementById("trophy-count").innerText = count;
+  document.getElementById("modal-trophy-count").innerText = count;
+  const list = document.getElementById("trophy-list");
+  if (!list) return;
+  list.innerHTML = Object.entries(ENDINGS).map(([key, ending]) => {
+    const got = unlocked.includes(key);
+    return `<div class="trophy ${got ? "" : "locked"}">
+      <div class="trophy-medal">${got ? ending.icon : "🔒"}</div>
+      <div><div class="trophy-name">${got ? ending.name : "Final desconhecido"}</div><div class="trophy-desc">${got ? ending.description : "Alcance este final para revelar o troféu."}</div></div>
+      <span class="trophy-state">${got ? "DESBLOQUEADO" : "BLOQUEADO"}</span>
+    </div>`;
+  }).join("");
 }
 
-function recordEnding(endingKey) {
-    const trophies = loadTrophies();
-    const isNew = !trophies[endingKey];
-    trophies[endingKey] = (trophies[endingKey] || 0) + 1;
-    saveTrophies(trophies);
-    updateTrophyBadges();
-    return isNew;
-}
-
-function updateTrophyBadges() {
-    const trophies = loadTrophies();
-    const unlockedCount = ENDING_KEYS.filter(k => trophies[k]).length;
-    const label = `${unlockedCount}/${ENDING_KEYS.length}`;
-    const badgeTitle = document.getElementById("trophy-count-badge");
-    const badgeProgress = document.getElementById("trophy-progress");
-    if (badgeTitle) badgeTitle.innerText = label;
-    if (badgeProgress) badgeProgress.innerText = label;
-}
-
-function renderTrophyGrid() {
-    const grid = document.getElementById("trophy-grid");
-    if (!grid) return;
-    const trophies = loadTrophies();
-    grid.innerHTML = "";
-
-    ENDING_KEYS.forEach(key => {
-        const meta = endingsMeta[key];
-        const count = trophies[key] || 0;
-        const unlocked = count > 0;
-
-        const card = document.createElement("div");
-        card.className = `trophy-card ${unlocked ? "unlocked" : "locked"}`;
-
-        card.innerHTML = `
-            <span class="trophy-icon">${unlocked ? meta.icon : "🔒"}</span>
-            <span class="trophy-name">${unlocked ? meta.name : "???"}</span>
-            <span class="trophy-desc">${unlocked ? meta.desc : "Continue jogando para descobrir este desfecho."}</span>
-            ${unlocked ? `<span class="trophy-times">Alcançado ${count}x</span>` : ""}
-        `;
-        grid.appendChild(card);
-    });
-
-    updateTrophyBadges();
-}
-
-/* ==========================================================================
-   NAVEGAÇÃO ENTRE TELAS
-   ========================================================================== */
-function showScreen(screenId) {
-    document.querySelectorAll(".screen").forEach(el => el.classList.remove("is-active"));
-    const target = document.getElementById(screenId);
-    if (target) target.classList.add("is-active");
-}
-
-/* ==========================================================================
-   FUNÇÕES DE INVENTÁRIO
-   ========================================================================== */
 function addItem(itemName) {
-    if (gameState.inventory.length < gameState.maxInventorySlots) {
-        if (!gameState.inventory.includes(itemName)) {
-            gameState.inventory.push(itemName);
-            updateHUD();
-            showMessage(`Item obtido: [${itemName}]`);
-            return true;
-        }
-    } else {
-        showMessage(`Sua mochila está cheia! Não foi possível pegar [${itemName}]`);
-        return false;
-    }
+  if (gameState.inventory.includes(itemName)) return true;
+  if (gameState.inventory.length >= gameState.maxInventorySlots) {
+    showMessage("Sua mochila está cheia. Você precisa deixar algum item para trás.");
+    return false;
+  }
+  gameState.inventory.push(itemName);
+  updateHUD();
+  showMessage(`Item obtido: ${itemName}.`);
+  return true;
 }
-
 function removeItem(itemName) {
-    const index = gameState.inventory.indexOf(itemName);
-    if (index > -1) {
-        gameState.inventory.splice(index, 1);
-        updateHUD();
-    }
+  const i = gameState.inventory.indexOf(itemName);
+  if (i >= 0) { gameState.inventory.splice(i, 1); updateHUD(); }
 }
-
-function hasItem(itemName) {
-    return gameState.inventory.includes(itemName);
-}
+function hasItem(itemName) { return gameState.inventory.includes(itemName); }
 
 function useConsumableItem(itemName) {
-    if (itemName === "Kit Médico") {
-        if (gameState.hp < gameState.maxHp) {
-            restoreHp(4);
-            removeItem("Kit Médico");
-            showMessage("Você tratou seus ferimentos com o Kit Médico (+4 HP)!");
-        } else {
-            showMessage("Sua saúde já está no máximo!");
-        }
-    } else {
-        showMessage(`[${itemName}] é um item de uso em momentos específicos da história.`);
-    }
+  if (itemName === "Kit Médico") {
+    if (gameState.hp >= gameState.maxHp) return showMessage("Você ainda não precisa usar o Kit Médico.");
+    restoreHp(4); removeItem(itemName); showMessage("Kit Médico usado: +4 VIDA.");
+  } else {
+    showMessage(`${itemName} só pode ser usado em uma situação específica.`);
+  }
 }
 
-/* ==========================================================================
-   SISTEMA DE MENSAGENS E ATRIBUTOS
-   ========================================================================== */
 function showMessage(msg) {
-    const diceBanner = document.getElementById("dice-banner");
-    const diceBannerText = document.getElementById("dice-banner-text");
-    if (diceBanner && diceBannerText) {
-        diceBannerText.innerText = msg;
-        diceBanner.classList.remove("hidden");
-    }
+  const banner = document.getElementById("dice-banner");
+  document.getElementById("dice-banner-text").innerText = msg;
+  banner.classList.remove("hidden");
 }
-
-function hideMessage() {
-    const diceBanner = document.getElementById("dice-banner");
-    if (diceBanner) diceBanner.classList.add("hidden");
-}
-
+function hideMessage() { document.getElementById("dice-banner").classList.add("hidden"); }
 function takeDamage(amount) {
-    gameState.hp = Math.max(0, gameState.hp - amount);
-    updateHUD();
-    if (gameState.hp <= 0) {
-        setTimeout(() => {
-            goToScene("ending_death");
-        }, 900);
-    }
+  gameState.hp = Math.max(0, gameState.hp - amount);
+  updateHUD();
+  if (gameState.hp <= 0) setTimeout(() => goToScene("ending_death"), 650);
 }
-
-function restoreHp(amount) {
-    gameState.hp = Math.min(gameState.maxHp, gameState.hp + amount);
-    updateHUD();
-}
-
-function useStamina(amount) {
-    gameState.stamina = Math.max(0, gameState.stamina - amount);
-    updateHUD();
-}
-
-function rollD6Value() {
-    return Math.floor(Math.random() * 6) + 1;
-}
-
-/* ==========================================================================
-   ANIMAÇÃO E ROLAGEM 3D DO DADO (ritmo mais lento e suspense maior)
-   ========================================================================== */
-const DICE_SPIN_DURATION = 2300; // tempo girando antes de revelar o resultado
-const DICE_RESULT_HOLD = 1900;   // tempo exibindo o resultado antes de fechar
+function restoreHp(amount) { gameState.hp = Math.min(gameState.maxHp, gameState.hp + amount); updateHUD(); }
+function useStamina(amount) { gameState.stamina = Math.max(0, gameState.stamina - amount); updateHUD(); }
+function recoverStamina(amount = 1) { gameState.stamina = Math.min(gameState.maxStamina, gameState.stamina + amount); updateHUD(); }
+function rollD6Value() { return Math.floor(Math.random() * 6) + 1; }
 
 function handleDiceTest({ bonus = 0, target, statusMsg, onSuccess, onFail }) {
-    if (gameState.isRolling) return;
-    gameState.isRolling = true;
+  if (gameState.isRolling) return;
+  gameState.isRolling = true;
+  const stage = document.getElementById("dice-stage");
+  const cube = document.getElementById("cube");
+  const status = document.getElementById("dice-status");
+  status.innerText = statusMsg || "O DADO ESTÁ ROLANDO...";
+  stage.classList.remove("hidden");
+  cube.classList.add("rolling");
 
-    const diceStage = document.getElementById("dice-stage");
-    const cube = document.getElementById("cube");
-    const diceStatus = document.getElementById("dice-status");
+  const roll = rollD6Value();
+  const total = roll + bonus;
+  const success = total >= target;
 
-    diceStatus.innerText = statusMsg || "TESTANDO SUA SORTE...";
-    diceStage.classList.remove("hidden");
-    cube.classList.add("rolling");
-
-    const roll = rollD6Value();
-    const total = roll + bonus;
-    const isSuccess = total >= target;
+  // Mais lento e legível para quem está assistindo ao stand.
+  setTimeout(() => {
+    cube.classList.remove("rolling");
+    const r = faceRotations[roll];
+    cube.style.transform = `rotateX(${r.x + 720}deg) rotateY(${r.y + 720}deg)`;
+    status.innerText = `DADO: ${roll}${bonus ? ` + ${bonus}` : ""}  •  TOTAL: ${total}  •  ${success ? "SUCESSO" : "FALHA"}`;
 
     setTimeout(() => {
-        cube.classList.remove("rolling");
-
-        gameState.rollSpins += 1440;
-        const targetRot = faceRotations[roll];
-        const finalX = targetRot.x + gameState.rollSpins;
-        const finalY = targetRot.y + gameState.rollSpins;
-        cube.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
-
-        let resultSummary = `Resultado: Dado (${roll})`;
-        if (bonus > 0) resultSummary += ` + Bônus (${bonus})`;
-        resultSummary += ` | Total: ${total}`;
-        diceStatus.innerText = `${resultSummary} - ${isSuccess ? "SUCESSO!" : "FALHA!"}`;
-
-        setTimeout(() => {
-            diceStage.classList.add("hidden");
-            gameState.isRolling = false;
-            showMessage(isSuccess ? `Sucesso no teste! (${roll} no dado)` : `Falha no teste! (${roll} no dado)`);
-
-            if (isSuccess && typeof onSuccess === "function") {
-                onSuccess();
-            } else if (!isSuccess && typeof onFail === "function") {
-                onFail();
-            }
-        }, DICE_RESULT_HOLD);
-
-    }, DICE_SPIN_DURATION);
+      stage.classList.add("hidden");
+      gameState.isRolling = false;
+      showMessage(success ? `Teste bem-sucedido! Você tirou ${roll}.` : `Teste falhou. Você tirou ${roll}.`);
+      if (success) onSuccess?.(); else onFail?.();
+    }, 850);
+  }, 1900);
 }
 
-/* ==========================================================================
-   ATUALIZAÇÃO DA HUD
-   ========================================================================== */
 function updateHUD() {
-    const hpDisplay = document.getElementById("hp-display");
-    const hpBar = document.getElementById("hp-bar");
-    if (hpDisplay) hpDisplay.innerText = `${gameState.hp}/${gameState.maxHp}`;
-    if (hpBar) hpBar.style.width = `${(gameState.hp / gameState.maxHp) * 100}%`;
-
-    const staminaDisplay = document.getElementById("stamina-display");
-    const staminaBar = document.getElementById("stamina-bar");
-    if (staminaDisplay) staminaDisplay.innerText = `${gameState.stamina}/${gameState.maxStamina}`;
-    if (staminaBar) staminaBar.style.width = `${(gameState.stamina / gameState.maxStamina) * 100}%`;
-
-    const invCount = document.getElementById("inv-count");
-    const inventoryList = document.getElementById("inventory-list");
-    if (invCount) invCount.innerText = gameState.inventory.length;
-
-    if (inventoryList) {
-        inventoryList.innerHTML = "";
-        for (let i = 0; i < gameState.maxInventorySlots; i++) {
-            if (i < gameState.inventory.length) {
-                const item = gameState.inventory[i];
-                const chip = document.createElement("div");
-                chip.className = "item-chip";
-                chip.innerText = item;
-                chip.title = "Clique para utilizar";
-                chip.onclick = () => useConsumableItem(item);
-                inventoryList.appendChild(chip);
-            } else {
-                const emptySlot = document.createElement("div");
-                emptySlot.className = "item-chip item-empty";
-                emptySlot.innerText = "—";
-                inventoryList.appendChild(emptySlot);
-            }
-        }
-    }
+  document.getElementById("hp-display").innerText = `${gameState.hp}/${gameState.maxHp}`;
+  document.getElementById("hp-bar").style.width = `${gameState.hp / gameState.maxHp * 100}%`;
+  document.getElementById("stamina-display").innerText = `${gameState.stamina}/${gameState.maxStamina}`;
+  document.getElementById("stamina-bar").style.width = `${gameState.stamina / gameState.maxStamina * 100}%`;
+  document.getElementById("inv-count");
+  const count = gameState.inventory.length;
+  const oldInv = document.querySelector(".inventory-slots");
+  // Inventário é mostrado como contador compacto no HUD; chips ficam no modal/tooltip quando necessário.
+  if (oldInv) oldInv.innerHTML = gameState.inventory.map(item => `<span class="item-chip">${item}</span>`).join("");
+  document.getElementById("progress-text").innerText = `Decisões: ${gameState.decisions}`;
 }
 
-/* ==========================================================================
-   ROTEIRO E CENAS NARRATIVAS
-   ========================================================================== */
+/* ========================= ROTEIRO ========================= */
 const scenes = {
-    prologue: {
-        chapter: "PRÓLOGO",
-        title: "A Estrada Esquecida para Crystal Lake",
-        text: "É noite de sexta-feira, 13 de julho de 1984. Uma tempestade implacável castiga a região. Seu carro derrapa na lama e para violentamente no acostamento de uma estrada abandonada.\n\nAo sair do veículo sob o temporal, a luz dos faróis ilumina uma placa de madeira corroída: 'BEM-VINDO AO ACAMPAMENTO CRYSTAL LAKE - FECHADO DESDE 1957'. O vento uiva entre os pinheiros altos.\n\nÀ sua esquerda, as luzes fracas de um antigo posto de gasolina piscam na neblina. À sua frente, uma trilha de terra segue em direção aos portões do acampamento.",
-        choices: [
-            {
-                text: "Investigar a oficina do posto em busca de abrigo e recursos",
-                tag: "Teste de Sorte",
-                action: () => handleDiceTest({
-                    target: 3,
-                    statusMsg: "Vasculhando a oficina escura...",
-                    onSuccess: () => {
-                        addItem("Lanterna");
-                        goToScene("prologue_gas_station");
-                    },
-                    onFail: () => {
-                        takeDamage(2);
-                        showMessage("Uma prateleira enferrujada desabou sobre você no escuro! (-2 HP)");
-                        goToScene("prologue_gas_station");
-                    }
-                })
-            },
-            {
-                text: "Abandonar o carro e marchar direto para o acampamento",
-                action: () => goToScene("arrival")
-            }
-        ]
-    },
-
-    prologue_gas_station: {
-        chapter: "PRÓLOGO",
-        title: "Sombra na Oficina",
-        text: "O interior do posto cheira a combustível velho e um odor pútrido. O teto de madeira goteja sobre o chão de concreto.\n\nNos fundos, você avista um veículo antigo coberto por uma lona rasgada. De repente, passos pesados esmagam o cascalho lá fora. Uma sombra colossal passa pela janela — algo está rondando o local, e não parece amigável.",
-        choices: [
-            {
-                text: "Forçar o porta-malas do carro antigo antes de ser notado",
-                tag: "Teste de Força",
-                action: () => handleDiceTest({
-                    bonus: gameState.stamina > 2 ? 1 : 0,
-                    target: 4,
-                    statusMsg: "Forçando a trava emperrada...",
-                    onSuccess: () => {
-                        addItem("Pé de Cabra");
-                        goToScene("arrival");
-                    },
-                    onFail: () => {
-                        useStamina(1);
-                        showMessage("A trava não cedeu e você se desgastou na tentativa (-1 Fôlego).");
-                        goToScene("arrival");
-                    }
-                })
-            },
-            {
-                text: "Esgueirar-se em silêncio rumo aos portões do acampamento",
-                tag: "Ação Furtiva",
-                action: () => goToScene("arrival")
-            }
-        ]
-    },
-
-    arrival: {
-        chapter: "CAPÍTULO I",
-        title: "Os Portões de Crystal Lake",
-        text: "Você alcança os portões de ferro do acampamento. A corrente que os trancava foi cortada a golpes de lâmina há pouco tempo — o corte ainda está limpo. Um grunhido abafado ecoa em algum lugar na escuridão; você não está sozinho aqui.\n\nÀ esquerda fica a Cabana Principal dos Monitores. À direita, a trilha afunda na mata rumo ao Lago e à Torre de Vigia.",
-        choices: [
-            {
-                reqItem: "Pé de Cabra",
-                text: "Usar o Pé de Cabra para remover as tábuas da Cabana Principal",
-                tag: "Usar Item",
-                action: () => {
-                    showMessage("Você remove as tábuas de madeira sem fazer barulho!");
-                    goToScene("cabin_inside");
-                }
-            },
-            {
-                text: "Tentar arrombar as tábuas na força bruta",
-                tag: "Teste de Força",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Forçando a entrada da cabana...",
-                    onSuccess: () => goToScene("cabin_inside"),
-                    onFail: () => {
-                        takeDamage(2);
-                        showMessage("A madeira resiste e você machuca o ombro! (-2 HP)");
-                        goToScene("arrival");
-                    }
-                })
-            },
-            {
-                text: "Seguir pela trilha que leva à Torre de Vigia",
-                action: () => goToScene("watchtower_path")
-            },
-            {
-                text: "Caminhar até a margem escura do Lago",
-                action: () => goToScene("lake_trail")
-            }
-        ]
-    },
-
-    cabin_inside: {
-        chapter: "CAPÍTULO II",
-        title: "O Despertar do Assassino",
-        text: "Você entra na Cabana Principal. Beliches destruídos e roupas velhas cobrem o chão. Em um armário na parede, você avista um Kit Médico de emergência.\n\nDE REPENTE, A PORTA DOS FUNDOS É DESTRUÍDA! Sob o brilho de um raio, surge uma figura colossal usando uma máscara de hóquei e empunhando um facão ensanguentado: Jason Voorhees!",
-        choices: [
-            {
-                text: "Pegar rapidamente o Kit Médico antes de fugir",
-                action: () => {
-                    addItem("Kit Médico");
-                    goToScene("cabin_fight");
-                }
-            },
-            {
-                reqItem: "Lanterna",
-                text: "Cegar Jason temporariamente com o facho da Lanterna",
-                tag: "Usar Item",
-                action: () => {
-                    showMessage("A luz intensa incomoda o monstro! Você ganha tempo para escapar!");
-                    goToScene("forest_chase");
-                }
-            },
-            {
-                text: "Subir os degraus até o Sótão para se esconder",
-                action: () => goToScene("cabin_attic")
-            },
-            {
-                text: "Enfrentar o ataque de frente",
-                action: () => goToScene("cabin_fight")
-            }
-        ]
-    },
-
-    cabin_attic: {
-        chapter: "CAPÍTULO II",
-        title: "O Sótão Silencioso",
-        text: "Você sobe apressadamente até o sótão. O espaço é pequeno, repleto de caixas antigas. Entre as quinquilharias, uma caixa metálica trancada chama sua atenção.\n\nEmbaixo, os passos pesados de Jason fazem as tábuas do teto rangerem sob seus pés.",
-        choices: [
-            {
-                text: "Tentar abrir a caixa metálica antes de ser descoberto",
-                tag: "Teste de Habilidade",
-                action: () => handleDiceTest({
-                    target: 3,
-                    statusMsg: "Abrindo o fecho de metal...",
-                    onSuccess: () => {
-                        addItem("Sinalizador");
-                        showMessage("Você encontrou uma pistola sinalizadora de emergência!");
-                        goToScene("forest_chase");
-                    },
-                    onFail: () => {
-                        takeDamage(2);
-                        showMessage("A lâmina do facão atravessa o teto e atinge sua perna! (-2 HP)");
-                        goToScene("forest_chase");
-                    }
-                })
-            },
-            {
-                text: "Saltar pela janela em direção ao monte de folhas lá fora",
-                tag: "Teste de Agilidade",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Saltando da janela...",
-                    onSuccess: () => {
-                        showMessage("Queda amortecida com sucesso!");
-                        goToScene("forest_chase");
-                    },
-                    onFail: () => {
-                        takeDamage(3);
-                        showMessage("Queda dura no chão molhado! (-3 HP)");
-                        goToScene("forest_chase");
-                    }
-                })
-            }
-        ]
-    },
-
-    cabin_fight: {
-        chapter: "CAPÍTULO II",
-        title: "A Lâmina Sangrenta",
-        text: "Jason avança sem emitir som. A lâmina pesada do facão se ergue para atingir você em cheio!",
-        choices: [
-            {
-                text: "Esquivar-se do golpe rolando pelo chão",
-                tag: "Teste de Agilidade",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Tentando esquivar no último segundo...",
-                    onSuccess: () => {
-                        showMessage("Você se esquiva e o facão se crava na parede!");
-                        goToScene("forest_chase");
-                    },
-                    onFail: () => {
-                        const dmg = rollD6Value();
-                        takeDamage(dmg);
-                        showMessage(`O facão rasga suas costas! (-${dmg} HP)`);
-                        if (gameState.hp > 0) goToScene("forest_chase");
-                    }
-                })
-            },
-            {
-                text: "Não arriscar o teste e correr para a saída dos fundos",
-                tag: gameState.stamina > 0 ? "Custa Fôlego" : "Sem Fôlego",
-                action: () => {
-                    if (gameState.stamina > 0) {
-                        useStamina(1);
-                        showMessage("Você escapa por pouco, gastando fôlego na correria (-1 Fôlego).");
-                    } else {
-                        takeDamage(2);
-                        showMessage("Exausto, você tropeça mas ainda consegue escapar! (-2 HP)");
-                    }
-                    goToScene("forest_chase");
-                }
-            }
-        ]
-    },
-
-    forest_chase: {
-        chapter: "CAPÍTULO III",
-        title: "Perseguição Sob o Temporal",
-        text: "Você corre pela floresta escura enquanto os passos de Jason ressoam logo atrás, quebrando galhos e derrubando arbustos.\n\nA tempestade atinge o ápice. A vegetação abre caminho para três direções:",
-        choices: [
-            { text: "Correr até a Garagem de Veículos", action: () => goToScene("garage_scene") },
-            { text: "Subir a colina íngreme em direção à Torre de Vigia", action: () => goToScene("watchtower_path") },
-            { text: "Fugir em direção ao Cais do Lago", action: () => goToScene("lake_trail") }
-        ]
-    },
-
-    garage_scene: {
-        chapter: "CAPÍTULO IV",
-        title: "O Galpão dos Veículos",
-        text: "Você entra no galpão de manutenção. No centro há uma antiga Pick-Up de resgate. Dentro da cabine, os cabos do painel estão arrancados. Em uma bancada ao fundo, há peças automotivas espalhadas.\n\nJason aproxima-se da entrada principal!",
-        choices: [
-            {
-                reqItem: "Chave da Pick-Up",
-                text: "Usar a Chave da Pick-Up e dar partida no motor",
-                tag: "Usar Item",
-                action: () => goToScene("ending_good_car")
-            },
-            {
-                text: "Fazer uma ligação direta nos cabos da ignição",
-                tag: "Teste de Habilidade",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Juntando os fios de ignição...",
-                    onSuccess: () => goToScene("ending_good_car"),
-                    onFail: () => {
-                        takeDamage(3);
-                        showMessage("Faíscas queimam suas mãos e o motor engasga! (-3 HP)");
-                        if (gameState.hp > 0) goToScene("forest_chase");
-                    }
-                })
-            },
-            {
-                text: "Procurar a chave no quadro de ferramentas",
-                tag: "Teste de Sorte",
-                action: () => handleDiceTest({
-                    target: 3,
-                    statusMsg: "Vasculhando o quadro de ferramentas...",
-                    onSuccess: () => {
-                        addItem("Chave da Pick-Up");
-                        goToScene("garage_scene");
-                    },
-                    onFail: () => {
-                        takeDamage(2);
-                        showMessage("Você perde tempo precioso procurando no escuro! (-2 HP)");
-                        goToScene("garage_scene");
-                    }
-                })
-            }
-        ]
-    },
-
-    watchtower_path: {
-        chapter: "CAPÍTULO IV",
-        title: "A Escalada da Torre",
-        text: "Você alcança a alta Torre de Vigia do guarda-florestal. Lá no alto fica a estação de rádio de emergência. A caixa de fusíveis do andar inferior está queimada, então o sinal está fraco.",
-        choices: [
-            {
-                text: "Subir direto para a sala de rádio e tentar a frequência de socorro",
-                tag: "Teste de Habilidade",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Alinhando a frequência de socorro...",
-                    onSuccess: () => goToScene("ending_heroic"),
-                    onFail: () => {
-                        takeDamage(3);
-                        showMessage("Sem energia total, o rádio emite apenas estática! (-3 HP)");
-                        goToScene("forest_chase");
-                    }
-                })
-            },
-            {
-                reqItem: "Sinalizador",
-                text: "Disparar a Pistola Sinalizadora do topo da torre",
-                tag: "Usar Item",
-                action: () => {
-                    showMessage("A luz vermelha ilumina o céu tempestuoso! A polícia avista a emergência!");
-                    goToScene("ending_heroic");
-                }
-            }
-        ]
-    },
-
-    lake_trail: {
-        chapter: "CAPÍTULO IV",
-        title: "As Águas de Crystal Lake",
-        text: "Você chega às tábuas podres do cais. Uma canoa a motor está presa à estaca de madeira. As águas escuras do lago se agitam com a chuva.\n\nA névoa se abre e uma silhueta emerge da água à sua frente!",
-        choices: [
-            {
-                text: "Tentar ligar o motor da canoa rapidamente",
-                tag: "Teste de Agilidade",
-                action: () => handleDiceTest({
-                    target: 4,
-                    statusMsg: "Puxando a corda do motor...",
-                    onSuccess: () => goToScene("ending_good_boat"),
-                    onFail: () => {
-                        takeDamage(4);
-                        showMessage("O motor engasga e o assassino alcança o cais! (-4 HP)");
-                        if (gameState.hp > 0) goToScene("lake_trail");
-                    }
-                })
-            },
-            {
-                reqItem: "Sinalizador",
-                text: "Disparar o Sinalizador diretamente contra Jason!",
-                tag: "Usar Item",
-                action: () => {
-                    showMessage("O disparo acerta Jason em cheio, arremessando-o de volta às águas!");
-                    goToScene("ending_good_boat");
-                }
-            }
-        ]
-    },
-
-    ending_death: {
-        chapter: "FIM DE JOGO",
-        title: "Sua Alma Pertence a Crystal Lake",
-        text: "Sua vida se esvai sob a tempestade. O silêncio macabro da noite volta a dominar a floresta. Seu nome se torna mais um mistério esquecido nas profundezas de Crystal Lake...",
-        isEnding: true
-    },
-
-    ending_good_car: {
-        chapter: "FINAL BOM",
-        title: "Fuga Pela Rodovia",
-        text: "O motor da Pick-Up ganha vida com um rugido! Você acelera com tudo, destruindo os velhos portões e deixando o pesadelo para trás na escuridão da tempestade!",
-        isEnding: true
-    },
-
-    ending_good_boat: {
-        chapter: "FINAL BOM",
-        title: "Além das Águas Escuras",
-        text: "O motor da canoa ganha potência e corta as águas sombrias do lago. Você navega com segurança até a margem oposta, onde as luzes de uma estrada garantem a sua salvação!",
-        isEnding: true
-    },
-
-    ending_heroic: {
-        chapter: "FINAL BOM",
-        title: "O Resgate da Polícia Estadual",
-        text: "Seu sinal de emergência é visto a tempo! Em poucos minutos, sirenes iluminam a rodovia e a polícia chega ao acampamento, resgatando você enquanto Jason recua para o fundo da mata.",
-        isEnding: true
-    }
+  prologue: {
+    chapter: "PRÓLOGO", title: "A estrada para Crystal Lake", image: "assets/images/prologue_road.jpg",
+    text: "É sexta-feira, 13 de julho de 1984. Uma tempestade derruba a visibilidade enquanto seu carro para numa estrada isolada.\n\nUm letreiro enferrujado indica Crystal Lake. O acampamento deveria estar fechado há décadas, mas uma luz aparece entre as árvores.\n\nÀ esquerda, um posto abandonado. À frente, os portões do acampamento.",
+    choices: [
+      { text: "Investigar o posto em busca de recursos", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "VASculhando o posto abandonado...", onSuccess: () => { addItem("Lanterna"); goToScene("gas_station"); }, onFail: () => { takeDamage(1); goToScene("gas_station"); } }) },
+      { text: "Deixar o carro e seguir direto para o acampamento", action: () => goToScene("arrival") }
+    ]
+  },
+  gas_station: {
+    chapter: "PRÓLOGO", title: "Sombra no posto", image: "assets/images/gas_station.jpg", text: "A oficina cheira a combustível velho. Enquanto você procura uma saída, ouve passos pesados do lado de fora.\n\nUm vulto passa pela janela. Não é hora de ficar parado.",
+    choices: [
+      { text: "Forçar o porta-malas do carro abandonado", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, bonus: gameState.stamina >= 3 ? 1 : 0, statusMsg: "FORÇANDO A TRAVA...", onSuccess: () => { addItem("Pé de Cabra"); goToScene("arrival"); }, onFail: () => { useStamina(1); goToScene("arrival"); } }) },
+      { text: "Sair em silêncio e seguir para os portões", tag: "FURTIVIDADE", action: () => goToScene("arrival") }
+    ]
+  },
+  arrival: {
+    chapter: "CAPÍTULO I", title: "Os portões de Crystal Lake", image: "assets/images/camp_gates.jpg", text: "Os portões estão abertos. A corrente foi cortada recentemente. No pátio existem cabanas, uma trilha para a torre de vigia e outra para o lago.\n\nVocê escuta um barulho metálico vindo de uma das cabanas.",
+    choices: [
+      { reqItem: "Pé de Cabra", text: "Usar o Pé de Cabra para entrar na cabana principal", tag: "ITEM", action: () => goToScene("cabin_inside") },
+      { text: "Entrar na cabana pela força", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, statusMsg: "FORÇANDO A PORTA...", onSuccess: () => goToScene("cabin_inside"), onFail: () => { takeDamage(2); recoverStamina(1); goToScene("arrival"); } }) },
+      { text: "Seguir pela trilha até a torre de vigia", action: () => goToScene("watchtower_path") },
+      { text: "Descer até o cais do lago", action: () => goToScene("lake_trail") }
+    ]
+  },
+  cabin_inside: {
+    chapter: "CAPÍTULO II", title: "O despertar", image: "assets/images/cabin_inside.jpg", text: "Dentro da cabana, tudo parece abandonado. Sobre uma prateleira há um Kit Médico. Então a porta dos fundos se rompe.\n\nUma figura enorme surge no vão: máscara de hóquei, roupa encharcada e um facão. Jason está diante de você.\n\nVocê tem poucos segundos para decidir.",
+    choices: [
+      { showIf: () => !hasItem("Kit Médico"), text: "Pegar o Kit Médico e correr", action: () => { if (addItem("Kit Médico")) goToScene("forest_chase"); } },
+      { reqItem: "Lanterna", text: "Apontar a Lanterna e ganhar tempo para fugir", tag: "ITEM", action: () => { removeItem("Lanterna"); goToScene("forest_chase"); } },
+      { text: "Subir para o sótão", action: () => goToScene("cabin_attic") },
+      { text: "Tentar escapar pela porta da frente", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "ESCAPANDO DA CABANA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
+    ]
+  },
+  cabin_attic: {
+    chapter: "CAPÍTULO II", title: "O sótão", image: "assets/images/cabin_attic.jpg", text: "Você se esconde no sótão. Caixas antigas ocupam o espaço. Uma delas contém um sinalizador de emergência.\n\nAs tábuas abaixo começam a ranger. Jason está subindo.",
+    choices: [
+      { showIf: () => !hasItem("Sinalizador"), text: "Abrir a caixa metálica", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 3, statusMsg: "ABRINDO O FECHO...", onSuccess: () => { addItem("Sinalizador"); goToScene("forest_chase"); }, onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) },
+      { text: "Saltar pela janela para a mata", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "SALTANDO PELA JANELA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
+    ]
+  },
+  forest_chase: {
+    chapter: "CAPÍTULO III", title: "A perseguição", image: "assets/images/forest_chase.jpg", text: "Você atravessa a floresta sob a chuva. Os passos atrás de você não diminuem.\n\nÀ frente, três caminhos oferecem uma chance de fuga: a garagem, a torre de vigia e o cais.",
+    choices: [
+      { text: "Correr para a garagem", action: () => goToScene("garage_scene") },
+      { text: "Subir até a torre de vigia", action: () => goToScene("watchtower_path") },
+      { text: "Descer para o cais", action: () => goToScene("lake_trail") }
+    ]
+  },
+  garage_scene: {
+    chapter: "CAPÍTULO IV", title: "O galpão dos veículos", image: "assets/images/garage.jpg", text: () => hasItem("Chave da Pick-Up") ? "A Pick-Up de resgate ainda está na garagem. Você encontrou a chave no quadro da oficina.\n\nJason está cada vez mais perto. Agora basta ligar o veículo e fugir." : "A garagem está escura. Uma Pick-Up de resgate ainda parece utilizável, mas a chave não está no contato.\n\nJason se aproxima pelo corredor. Você precisa decidir se procura a chave ou tenta ligar o veículo por conta própria.",
+    choices: [
+      { reqItem: "Chave da Pick-Up", text: "Usar a chave e ligar a Pick-Up", tag: "ITEM", action: () => goToScene("ending_good_car") },
+      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Procurar a chave no quadro da oficina", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "PROCURANDO A CHAVE...", onSuccess: () => {
+          if (addItem("Chave da Pick-Up")) goToScene("garage_scene");
+          else goToScene("garage_escape");
+        }, onFail: () => { useStamina(1); goToScene("garage_escape"); } }) },
+      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Tentar ligar a Pick-Up sem a chave", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 5, statusMsg: "TENTANDO DAR PARTIDA...", onSuccess: () => goToScene("ending_good_car"), onFail: () => { takeDamage(2); goToScene("garage_escape"); } }) }
+    ]
+  },
+  garage_escape: {
+    chapter: "CAPÍTULO IV", title: "Sem tempo para tentar de novo", text: "O barulho chamou atenção. Jason já está entrando na garagem. A Pick-Up não é mais uma opção segura.\n\nVocê corre por uma porta lateral e volta para a trilha.",
+    choices: [
+      { text: "Correr para a torre de vigia", action: () => goToScene("watchtower_path") },
+      { text: "Correr para o lago", action: () => goToScene("lake_trail") }
+    ]
+  },
+  watchtower_path: {
+    chapter: "CAPÍTULO IV", title: "A torre de vigia", image: "assets/images/watchtower.jpg", text: "No alto da torre existe um rádio de emergência. A energia está instável, mas a antena ainda aponta para a estrada estadual.\n\nUm sinalizador também poderia chamar atenção de quem estiver passando pela região.",
+    choices: [
+      { text: "Tentar transmitir um pedido de socorro", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "BUSCANDO A FREQUÊNCIA...", onSuccess: () => goToScene("ending_heroic"), onFail: () => { takeDamage(1); goToScene("tower_escape"); } }) },
+      { reqItem: "Sinalizador", text: "Disparar o sinalizador para a estrada", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
+      { text: "Descer e procurar outro caminho", action: () => goToScene("lake_trail") }
+    ]
+  },
+  tower_escape: {
+    chapter: "CAPÍTULO IV", title: "A torre não é segura", text: "O rádio falha e um estrondo faz a torre tremer. Ficar aqui seria um erro.\n\nVocê desce antes que seja tarde demais.",
+    choices: [
+      { text: "Ir para o cais", action: () => goToScene("lake_trail") },
+      { text: "Voltar para a garagem", action: () => goToScene("garage_escape") }
+    ]
+  },
+  lake_trail: {
+    chapter: "CAPÍTULO IV", title: "As águas de Crystal Lake", image: "assets/images/lake.jpg", text: "O cais está escorregadio e a chuva transforma o lago em uma massa escura. Uma pequena lancha de manutenção está presa à margem.\n\nVocê ouve passos atrás de si. Não há muito tempo.",
+    choices: [
+      { text: "Tentar ligar o motor da lancha", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "PUXANDO O MOTOR...", onSuccess: () => goToScene("ending_good_boat"), onFail: () => { takeDamage(2); goToScene("lake_escape"); } }) },
+      { reqItem: "Sinalizador", text: "Usar o sinalizador para chamar ajuda", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
+      { text: "Abandonar o cais e procurar a torre", action: () => goToScene("watchtower_path") }
+    ]
+  },
+  lake_escape: {
+    chapter: "CAPÍTULO IV", title: "O cais ficou para trás", text: "O motor não pegou. Você recua antes que alguém alcance o cais. A mata parece ser a única saída restante.",
+    choices: [
+      { text: "Subir até a torre de vigia", action: () => goToScene("watchtower_path") },
+      { text: "Correr para a garagem", action: () => goToScene("garage_escape") }
+    ]
+  },
+  ending_death: { chapter: "FIM DE JOGO", image: "assets/images/ending_death.jpg", title: "Crystal Lake venceu", text: "A perseguição termina na escuridão. Crystal Lake guarda mais um segredo, e sua história chega ao fim.\n\nVocê não sobreviveu desta vez — mas talvez outra escolha mude o resultado.", ending: true, choices: [{ text: "Tentar novamente", action: () => restartGame() }] },
+  ending_good_car: { chapter: "FINAL", image: "assets/images/ending_car.jpg", title: "Fuga pela rodovia", text: "A Pick-Up finalmente pega. Você atravessa os portões e acelera pela estrada, deixando Crystal Lake para trás.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
+  ending_good_boat: { chapter: "FINAL", image: "assets/images/ending_boat.jpg", title: "Além das águas", text: "O motor da lancha responde. Você cruza o lago e alcança a margem oposta antes que a perseguição possa continuar.\n\nVocê sobreviveu.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] },
+  ending_heroic: { chapter: "FINAL", image: "assets/images/ending_rescue.jpg", title: "Resgate estadual", text: "Seu pedido de socorro é ouvido. Sirenes aparecem na estrada e a equipe de resgate chega ao acampamento.\n\nVocê sobreviveu — e Crystal Lake terá de explicar o que aconteceu aqui.", ending: true, choices: [{ text: "Jogar novamente", action: () => restartGame() }] }
 };
 
-/* ==========================================================================
-   NAVEGAÇÃO E CICLO DE JOGO
-   ========================================================================== */
 function goToScene(sceneKey) {
-    const scene = scenes[sceneKey];
-    if (!scene) {
-        console.error(`Cena não encontrada: ${sceneKey}`);
-        return;
-    }
+  const scene = scenes[sceneKey];
+  if (!scene) return console.error("Cena não encontrada:", sceneKey);
+  gameState.currentScene = sceneKey;
+  gameState.visited.add(sceneKey);
+  if (scene.ending) saveTrophy(sceneKey);
 
-    gameState.currentScene = sceneKey;
+  document.getElementById("chapter-badge").innerText = scene.chapter;
+  document.getElementById("scene-title").innerText = scene.title;
+  document.getElementById("scene-text").innerText = typeof scene.text === "function" ? scene.text() : scene.text;
 
-    if (scene.isEnding) {
-        renderEndingScreen(sceneKey, scene);
-        return;
-    }
+  const img = document.getElementById("scene-image");
+  const placeholder = document.getElementById("image-placeholder");
+  if (scene.image) {
+    img.src = scene.image;
+    img.alt = scene.title;
+    img.classList.remove("hidden");
+    placeholder.classList.add("hidden");
+    img.onerror = () => { img.classList.add("hidden"); placeholder.classList.remove("hidden"); };
+  } else {
+    img.classList.add("hidden"); placeholder.classList.remove("hidden");
+  }
 
-    const chapterBadge = document.getElementById("chapter-badge");
-    if (chapterBadge) chapterBadge.innerText = scene.chapter || "CAPÍTULO";
-
-    const sceneTitle = document.getElementById("scene-title");
-    const sceneText = document.getElementById("scene-text");
-    if (sceneTitle) sceneTitle.innerText = scene.title;
-    if (sceneText) sceneText.innerText = scene.text;
-
-    const sceneImg = document.getElementById("scene-image");
-    const imgPlaceholder = document.getElementById("image-placeholder");
-
-    if (scene.image) {
-        sceneImg.src = scene.image;
-        sceneImg.classList.remove("hidden");
-        if (imgPlaceholder) imgPlaceholder.classList.add("hidden");
-        sceneImg.onerror = () => {
-            sceneImg.classList.add("hidden");
-            if (imgPlaceholder) imgPlaceholder.classList.remove("hidden");
-        };
-    } else {
-        if (sceneImg) sceneImg.classList.add("hidden");
-        if (imgPlaceholder) imgPlaceholder.classList.remove("hidden");
-    }
-
-    const choicesContainer = document.getElementById("choices-container");
-    if (choicesContainer) {
-        choicesContainer.innerHTML = "";
-
-        if (scene.choices && scene.choices.length > 0) {
-            scene.choices.forEach(choice => {
-                const btn = document.createElement("button");
-                btn.className = "btn-choice";
-
-                let isDisabled = false;
-                if (choice.reqItem && !hasItem(choice.reqItem)) {
-                    isDisabled = true;
-                }
-
-                let btnHTML = `<span>${choice.text}</span>`;
-                if (choice.reqItem) {
-                    btnHTML += isDisabled
-                        ? ` <span class="btn-tag btn-tag-disabled">Requer: ${choice.reqItem}</span>`
-                        : ` <span class="btn-tag btn-tag-item">Usar: ${choice.reqItem}</span>`;
-                } else if (choice.tag) {
-                    btnHTML += ` <span class="btn-tag">${choice.tag}</span>`;
-                }
-
-                btn.innerHTML = btnHTML;
-                btn.disabled = isDisabled;
-                btn.onclick = () => {
-                    hideMessage();
-                    if (typeof choice.action === "function") choice.action();
-                };
-
-                choicesContainer.appendChild(btn);
-            });
-        }
-    }
-
-    const narrativeBox = document.getElementById("narrative-box");
-    if (narrativeBox) {
-        narrativeBox.scrollTop = 0;
-        narrativeBox.classList.remove("narrative-enter");
-        // força reflow para reiniciar a animação a cada troca de cena
-        void narrativeBox.offsetWidth;
-        narrativeBox.classList.add("narrative-enter");
-    }
-}
-
-function renderEndingScreen(sceneKey, scene) {
-    const meta = endingsMeta[sceneKey] || { icon: "🎬", kicker: "Fim de Jogo" };
-    const isNew = recordEnding(sceneKey);
-
-    document.getElementById("ending-icon").innerText = meta.icon;
-    document.getElementById("ending-kicker").innerText = meta.kicker;
-    document.getElementById("ending-title").innerText = scene.title;
-    document.getElementById("ending-text").innerText = scene.text;
-
-    const newBadge = document.getElementById("ending-new-badge");
-    if (newBadge) newBadge.classList.toggle("hidden", !isNew);
-
-    showScreen("screen-ending");
+  const container = document.getElementById("choices-container");
+  container.innerHTML = "";
+  scene.choices?.filter(choice => !choice.showIf || choice.showIf()).forEach((choice, index) => {
+    const btn = document.createElement("button");
+    btn.className = "btn-choice";
+    const disabled = Boolean(choice.reqItem && !hasItem(choice.reqItem));
+    btn.disabled = disabled;
+    let tag = "";
+    if (choice.reqItem) tag = `<span class="btn-tag ${disabled ? "btn-tag-disabled" : "btn-tag-item"}">${disabled ? `REQUER: ${choice.reqItem}` : `USAR: ${choice.reqItem}`}</span>`;
+    else if (choice.tag) tag = `<span class="btn-tag">${choice.tag}</span>`;
+    btn.innerHTML = `<span class="choice-number">${index + 1}</span><span class="choice-content">${choice.text}</span>${tag}`;
+    btn.onclick = () => {
+      if (gameState.isRolling) return;
+      hideMessage();
+      gameState.decisions++;
+      updateHUD();
+      choice.action?.();
+    };
+    container.appendChild(btn);
+  });
+  document.getElementById("narrative-box").scrollTop = 0;
+  updateHUD();
 }
 
 function restartGame() {
-    gameState.hp = gameState.maxHp;
-    gameState.stamina = gameState.maxStamina;
-    gameState.inventory = [];
-    gameState.isRolling = false;
-    gameState.rollSpins = 0;
-    hideMessage();
-    updateHUD();
-    showScreen("game-container");
-    goToScene("prologue");
+  gameState.hp = gameState.maxHp;
+  gameState.stamina = gameState.maxStamina;
+  gameState.inventory = [];
+  gameState.decisions = 0;
+  gameState.isRolling = false;
+  gameState.visited.clear();
+  hideMessage();
+  updateHUD();
+  goToScene("prologue");
 }
 
-/* ==========================================================================
-   INICIALIZAÇÃO E EVENTOS DE TELA
-   ========================================================================== */
+function openTrophies() { updateTrophyUI(); document.getElementById("trophy-modal").classList.remove("hidden"); }
+function closeTrophies() { document.getElementById("trophy-modal").classList.add("hidden"); }
+
 document.addEventListener("DOMContentLoaded", () => {
-    updateHUD();
-    updateTrophyBadges();
-
-    document.getElementById("btn-start").onclick = () => restartGame();
-
-    document.getElementById("btn-trophies").onclick = () => {
-        renderTrophyGrid();
-        showScreen("screen-trophies");
-    };
-    document.getElementById("btn-back-title").onclick = () => showScreen("screen-title");
-
-    document.getElementById("btn-menu").onclick = () => showScreen("screen-title");
-
-    document.getElementById("btn-play-again").onclick = () => restartGame();
-    document.getElementById("btn-ending-trophies").onclick = () => {
-        renderTrophyGrid();
-        showScreen("screen-trophies");
-    };
-    document.getElementById("btn-ending-menu").onclick = () => showScreen("screen-title");
+  document.getElementById("trophy-button").onclick = openTrophies;
+  document.getElementById("close-trophy").onclick = closeTrophies;
+  document.getElementById("trophy-modal").addEventListener("click", e => { if (e.target.id === "trophy-modal") closeTrophies(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeTrophies(); });
+  updateTrophyUI();
+  updateHUD();
+  goToScene("prologue");
 });
