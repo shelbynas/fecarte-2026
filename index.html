@@ -3,134 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>O Telefone Preto — Echoes From the Basement</title>
-
+  <title>Qual é o seu fim?</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/crt-effects.css">
-  <link rel="stylesheet" href="css/components.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="crt-screen">
+<body>
 
-  <!-- Efeitos visuais de retro TV CRT e alerta vermelho -->
-  <div class="scanlines"></div>
-  <div class="crt-vignette"></div>
-  <div id="red-pulse" class="red-pulse-overlay"></div>
+  <!-- Efeito de Granulado/Ruído de Fundo -->
+  <div class="noise-overlay"></div>
 
-  <div class="game-container">
-    <header class="game-header">
-      <div class="header-left">
-        <h1 class="glitch-title" data-text="O TELEFONE PRETO">O TELEFONE PRETO</h1>
-        <span class="subtitle">DENVER, COLORADO — 1978</span>
+  <!-- Cabeçalho Principal -->
+  <header class="main-header">
+    <h1 class="horror-title" data-text="Qual é o seu fim?">-Qual é o seu fim?-</h1>
+    <p class="subtitle">Escolha o seu destino... se tiver coragem.</p>
+  </header>
+
+  <!-- Grid com os Posteres / Links -->
+  <main class="menu-container">
+    
+    <!-- Pânico -->
+    <a href="https://seu-link-panico.com" class="movie-card" data-movie="panico">
+      <div class="poster-wrapper">
+        <img src="../pagina iinicial/img/poster_panico.jpg" alt="Poster Pânico" class="poster-img">
+        <div class="card-overlay">
+          <span class="movie-title">Pânico</span>
+          <span class="cta-btn">Entrar na Ligação</span>
+        </div>
       </div>
-      <div class="header-right">
-        <div class="progress-badge">
-          <span>FINAIS: </span>
-          <strong id="endings-count">0 / 17</strong>
+    </a>
+
+    <!-- Sexta-Feira 13 -->
+    <a href="Sexta-Feira13/index.html" class="movie-card" data-movie="sexta-13">
+      <div class="poster-wrapper">
+        <img src="../fecarte-2026/img/poster_sexta_feira13.jpg" alt="Poster Sexta-Feira 13" class="poster-img">
+        <div class="card-overlay">
+          <span class="movie-title">Sexta-Feira 13</span>
+          <span class="cta-btn">Ir a Crystal Lake</span>
         </div>
-        <button id="btn-achievements" class="btn-icon" title="Galeria de Finais">
-          🏆 <span>FINAIS</span>
-        </button>
-        <button id="btn-audio" class="btn-icon" title="Alternar Áudio">
-          🔊 <span id="audio-status">SOM: ON</span>
-        </button>
       </div>
-    </header>
+    </a>
 
-    <main class="game-main">
-      <!-- Painel Esquerdo: Telefone, Inventário e Status -->
-      <aside class="sidebar-panel">
-        <div class="phone-wrapper" id="phone-container">
-          <div class="phone-status-badge" id="phone-status-text">DESCONECTADO</div>
-          <svg class="phone-svg" id="phone-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <!-- Base do Telefone -->
-            <rect x="40" y="100" width="120" height="70" rx="15" fill="#18181c" stroke="#33333c" stroke-width="4"/>
-            <!-- Disco Telefônico -->
-            <circle cx="100" cy="135" r="22" fill="#0c0c0e" stroke="#ffaa00" stroke-width="2"/>
-            <circle cx="100" cy="120" r="3" fill="#ffaa00"/>
-            <circle cx="112" cy="128" r="3" fill="#ffaa00"/>
-            <circle cx="112" cy="142" r="3" fill="#ffaa00"/>
-            <circle cx="100" cy="150" r="3" fill="#ffaa00"/>
-            <circle cx="88" cy="142" r="3" fill="#ffaa00"/>
-            <circle cx="88" cy="128" r="3" fill="#ffaa00"/>
-            <!-- Gancho -->
-            <rect x="60" y="85" width="80" height="15" rx="5" fill="#101014" stroke="#2a2a30" stroke-width="2"/>
-            <!-- Monofone/Fone -->
-            <path id="phone-handle" d="M 30,80 C 30,50 170,50 170,80 C 170,95 150,90 140,75 C 130,65 70,65 60,75 C 50,90 30,95 30,80 Z" fill="#121216" stroke="#8b0000" stroke-width="3"/>
-            <!-- Fio Cortado / Desconectado -->
-            <path d="M 45,150 Q 25,160 20,180" fill="none" stroke="#ff3333" stroke-width="3" stroke-dasharray="4,2"/>
-          </svg>
+    <!-- Jogos Mortais -->
+    <a href="https://seu-link-jogosmortais.com" class="movie-card" data-movie="jogos-mortais">
+      <div class="poster-wrapper">
+        <img src="../pagina iinicial/img/poster_jogos_mortais.jpg" alt="Poster Jogos Mortais" class="poster-img">
+        <div class="card-overlay">
+          <span class="movie-title">Jogos Mortais</span>
+          <span class="cta-btn">Iniciar o Jogo</span>
         </div>
-
-        <div class="inventory-box">
-          <h2 class="box-title">🎒 INVENTÁRIO DE FINNEY</h2>
-          <ul id="inventory-list" class="inventory-list">
-            <li class="empty-item">Nenhum item coletado</li>
-          </ul>
-        </div>
-
-        <div class="status-box">
-          <div class="status-row">
-            <span>LOCAL:</span>
-            <strong id="current-location">Porão de Concreto</strong>
-          </div>
-          <div class="status-row">
-            <span>MÁSCARA:</span>
-            <strong id="grabber-status">O Grabber espreita...</strong>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Painel Direito: Narrativa e Escolhas -->
-      <section class="story-panel">
-        <div class="chapter-header">
-          <h2 id="chapter-title" class="chapter-title">📖 CARREGANDO...</h2>
-        </div>
-
-        <div class="narrative-box">
-          <p id="chapter-text" class="narrative-text"></p>
-        </div>
-
-        <div class="retro-divider">
-          <span>◆ DECISÃO DE FINNEY SHAW ◆</span>
-        </div>
-
-        <div id="choice-buttons" class="choices-container"></div>
-      </section>
-    </main>
-
-    <footer class="game-footer">
-      <span>PROJETO ESCOLAR RPG — O TELEFONE PRETO (1978)</span>
-      <button id="btn-reset-game" class="btn-link">REINICIAR HISTÓRIA</button>
-    </footer>
-  </div>
-
-  <!-- Modal da Galeria de 17 Finais (Conquistas) -->
-  <div id="achievements-modal" class="modal-backdrop hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🏆 GALERIA DE FINAIS (17 DESFECHOS)</h2>
-        <button id="btn-close-modal" class="btn-close">&times;</button>
       </div>
-      <div class="modal-body">
-        <p class="modal-desc">Explore as escolhas e descubra todos os desfechos possíveis da história de Finney no porão do Grabber.</p>
-        <div id="achievements-grid" class="achievements-grid"></div>
-      </div>
-      <div class="modal-footer">
-        <button id="btn-reset-progress" class="btn-danger">LIMPAR PROGRESSO SALVO</button>
-      </div>
-    </div>
-  </div>
+    </a>
 
-  <!-- Scripts Modulares -->
-  <script src="js/storyData.js"></script>
-  <script src="js/audioEngine.js"></script>
-  <script src="js/inventorySystem.js"></script>
-  <script src="js/achievements.js"></script>
-  <script src="js/uiController.js"></script>
-  <script src="js/app.js"></script>
+    <!-- O Telefone Preto -->
+    <a href="Telefone-preto/index.html" class="movie-card" data-movie="telefone-preto">
+      <div class="poster-wrapper">
+        <img src="../pagina iinicial/img/telefone_preto_poster.jpg" alt="Poster O Telefone Preto" class="poster-img">
+        <div class="card-overlay">
+          <span class="movie-title">O Telefone Preto</span>
+          <span class="cta-btn">Atender a Chamada</span>
+        </div>
+      </div>
+    </a>
+
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>

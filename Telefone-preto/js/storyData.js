@@ -1,593 +1,593 @@
 const storyData = {
-    prologo: {
-      id: "prologo",
-      titulo: "🎬 PRÓLOGO — Antes de Iniciar",
-      texto: `Denver, Colorado — 1978.
-  A cidade está com medo. Nas últimas semanas, cinco garotos desapareceram sem deixar rastro. As crianças sussurram o nome dele no recreio, os adultos fingem que não ouvem. Mas todo mundo sabe: o Grabber está lá fora.
-  
-  Ele usa máscaras assustadoras. Oferece balões pretos para os meninos que encontra. E ninguém que entrou na van dele jamais voltou.
-  
-  Você é Finney Shaw, 13 anos. Você é esperto — e isso pode ser a única coisa que vai te salvar. Enquanto isso, sua irmã Gwen tem sonhos estranhos que mostram coisas que ainda não aconteceram. E esta noite ela sonhou com você num porão escuro, com um telefone preto tocando na parede.
-  
-  O telefone vai tocar. E do outro lado da linha, os mortos vão falar.`,
-      isRinging: false,
-      botoes: [{ texto: "🔘 [COMEÇAR]", destino: "cap1" }]
-    },
-  
-    cap1: {
-      id: "cap1",
-      titulo: "📖 CAPÍTULO 1 — O DESPERTAR",
-      texto: `A primeira coisa que você sente é o cheiro de mofo, ferrugem e poeira velha. Você está deitado num colchão fino no chão de concreto frio. Sua cabeça dói.
-  
-  Você se lembra da van preta, do homem de máscara e do balão preto...
-  Pendurado na parede há um telefone preto de disco. O fio está arrancado, pendurado inerte. É impossível que ele funcione.
-  
-  E é exatamente por isso que, quando ele começa a tocar, seu sangue gela.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap2a" },
-        { texto: "🔘 [Ignorar e procurar uma saída]", destino: "cap2b" },
-        { texto: "🔘 [Gritar por ajuda]", destino: "cap2c" }
-      ]
-    },
-  
-    cap2a: {
-      id: "cap2a",
-      titulo: "📖 CAPÍTULO 2A — A VOZ DO OUTRO LADO",
-      texto: `Sua mão treme ao aproximar o fone do ouvido. Uma voz de garoto, meio distorcida, fala:
-  "Meu nome é Robin. Robin Arellano. Eu já estive onde você está agora. O Grabber vai querer brincar com você, mas você pode lutar."
-  
-  "Como? A porta está trancada!", você responde.
-  "Tem sempre uma saída, garoto. Procure no chão. Há algo solto. Uma pedra que se move. Fui eu que deixei."
-  A ligação cai com um chiado.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Procurar algo solto no chão]", destino: "cap3a" },
-        { texto: "🔘 [Perguntar em voz alta quem estava falando]", destino: "cap3b" },
-        { texto: "🔘 [Desligar e tentar arrombar a porta]", destino: "cap3c" }
-      ]
-    },
-  
-    cap2b: {
-      id: "cap2b",
-      titulo: "📖 CAPÍTULO 2B — PROCURANDO UMA SAÍDA",
-      texto: `Você ignora o telefone. Telefones sem fio não funcionam.
-  Você tateia as paredes de concreto. A porta é de metal reforçado sem maçaneta interna. A janela está alta demais.
-  O telefone continua tocando na parede. Insistente, desesperado.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Voltar e atender o telefone]", destino: "cap2a" },
-        { texto: "🔘 [Tentar alcançar a janela]", destino: "cap3d" },
-        { texto: "🔘 [Sentar e esperar o sequestrador voltar]", destino: "cap3e" }
-      ]
-    },
-  
-    cap2c: {
-      id: "cap2c",
-      titulo: "📖 CAPÍTULO 2C — GRITANDO POR AJUDA",
-      texto: `Você grita por socorro até a garganta doer. Mas o porão não deixa o som escapar. Ninguém lá fora pode te ouvir.
-  O telefone dá uma pausa e volta a tocar de novo, ainda mais alto!`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap2a" },
-        { texto: "🔘 [Continuar gritando até a voz falhar]", destino: "cap3f" },
-        { texto: "🔘 [Chutar a porta com raiva]", destino: "cap3c" }
-      ]
-    },
-  
-    cap3a: {
-      id: "cap3a",
-      titulo: "📖 CAPÍTULO 3A — O OBJETO NO CHÃO",
-      texto: `Você tateia as rachaduras do chão até encontrar uma pedra solta!
-  Embaixo dela, há um PEDAÇO DE VIDRO AFIADO envolto num pano sujo.
-  O telefone volta a tocar...`,
-      isRinging: true,
-      addItem: "Pedaço de Vidro Afiado",
-      botoes: [
-        { texto: "🔘 [Atender o telefone com o vidro na mão]", destino: "cap4a" },
-        { texto: "🔘 [Esconder o vidro e esperar]", destino: "cap4b" },
-        { texto: "🔘 [Usar o vidro para cortar a corda do telefone]", destino: "cap4c" }
-      ]
-    },
-  
-    cap3b: {
-      id: "cap3b",
-      titulo: "📖 CAPÍTULO 3B — A VOZ SUMIU",
-      texto: `Você pergunta quem está aí, mas o telefone fica mudo. A ligação caiu. Você se arrepende de não ter ouvido mais.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Procurar no chão mesmo assim]", destino: "cap3a" },
-        { texto: "🔘 [Sentar no colchão e esperar]", destino: "cap4b" }
-      ]
-    },
-  
-    cap3c: {
-      id: "cap3c",
-      titulo: "📖 CAPÍTULO 3C — A PORTA DE METAL",
-      texto: `Você chuta a porta com toda a força! CRACK! O metal amassa levemente, mas do outro lado você ouve PASSOS PESADOS descendo a escada!`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Fingir que está dormindo na cama]", destino: "cap4d" },
-        { texto: "🔘 [Ficar atrás da porta pronto para atacar com o vidro]", destino: "cap4e", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Ficar atrás da porta e tentar surpreendê-lo desarmado]", destino: "cap4e2" },
-        { texto: "🔘 [Atender o telefone que voltou a tocar]", destino: "cap4a" }
-      ]
-    },
-  
-    cap3d: {
-      id: "cap3d",
-      titulo: "📖 CAPÍTULO 3D — A JANELA",
-      texto: `Você empilha o vaso e alcança a janela alta. Do outro lado você vê o quintal sob a lua. As grades estão firmes e o vidro é grosso. Quebrá-lo fará muito barulho.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Quebrar o vidro e gritar por socorro]", destino: "cap4f" },
-        { texto: "🔘 [Desistir e voltar para o chão]", destino: "cap3a" },
-        { texto: "🔘 [Tentar arrancar as grades com as mãos]", destino: "cap4g" }
-      ]
-    },
-  
-    cap3e: {
-      id: "cap3e",
-      titulo: "📖 CAPÍTULO 3E — ESPERAR O SEQUESTRADOR",
-      texto: `A tranca se abre. O Grabber entra vestindo sua máscara sorridente de duas partes. Ele traz pão duro e água morna.
-  "Comportado, hein? Vamos ver quanto tempo dura."`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Aceitar a comida e ficar quieto]", destino: "cap5a" },
-        { texto: "🔘 [Cuspir na máscara dele]", destino: "cap5b" },
-        { texto: "🔘 [Tentar pegar a chave do bolso dele]", destino: "cap5c" }
-      ]
-    },
-  
-    cap3f: {
-      id: "cap3f",
-      titulo: "📖 CAPÍTULO 3F — VOZ FALHANDO",
-      texto: `Sua voz falha de tanto gritar. Ninguém responde. Você está exausto.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap2a" },
-        { texto: "🔘 [Chutar a porta com raiva]", destino: "cap3c" },
-        { texto: "🔘 [Sentar e esperar o sequestrador]", destino: "cap3e" }
-      ]
-    },
-  
-    cap4a: {
-      id: "cap4a",
-      titulo: "📖 CAPÍTULO 4A — O TELEFONE",
-      texto: `Outra voz de garoto avisa: "Aquele telefone é uma porta. Nós estamos do outro lado. O Grabber acha que o telefone é inútil. Use isso a seu favor!"`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Usar o vidro para cortar a corda do telefone]", destino: "cap5d", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Guardar o vidro e esperar o Grabber]", destino: "cap4d", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Desligar e esperar o Grabber em silêncio]", destino: "cap4d" }
-      ]
-    },
-  
-    cap4b: {
-      id: "cap4b",
-      titulo: "📖 CAPÍTULO 4B — ESPERAR ESCONDIDO",
-      texto: `O Grabber entra vestindo uma máscara de DIABO com chifres. Ele nota que o telefone tocou e fica irritado!
-  "Você não atendeu o telefone... por quê?"`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Mentir: 'Não ouvi nada']", destino: "cap5e" },
-        { texto: "🔘 [Perguntar sobre as outras vítimas]", destino: "cap5f" },
-        { texto: "🔘 [Atacar com o vidro]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" }
-      ]
-    },
-  
-    cap4c: {
-      id: "cap4c",
-      titulo: "📖 CAPÍTULO 4C — CORTANDO A CORDA",
-      texto: `Você corta a corda do telefone com o vidro. O fone cai no chão. Agora o telefone está quebrado.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Usar o vidro para tentar forçar a fechadura]", destino: "cap5h" },
-        { texto: "🔘 [Gritar por ajuda]", destino: "cap3f" }
-      ]
-    },
-  
-    cap4d: {
-      id: "cap4d",
-      titulo: "📖 CAPÍTULO 4D — FINGIR QUE DORME",
-      texto: `Você se deita no colchão. O Grabber entra, toca seu ombro com sua mão pesada e diz: "Acorda, garoto. Hora de brincar."`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Abrir os olhos lentamente]", destino: "cap5i" },
-        { texto: "🔘 [Atacar com o vidro afiado]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Continuar fingindo que dorme]", destino: "cap5j" }
-      ]
-    },
-  
-    cap4e: {
-      id: "cap4e",
-      titulo: "📖 CAPÍTULO 4E — PRONTO PARA ATACAR",
-      texto: `Você golpeia o braço do Grabber com o vidro! Ele urra de dor, te empurra com força e tranca a porta por fora irritado!`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Levantar e atender o telefone]", destino: "cap4a" },
-        { texto: "🔘 [Ficar no chão chorando de dor]", destino: "cap5k" }
-      ]
-    },
-  
-    cap4e2: {
-      id: "cap4e2",
-      titulo: "📖 CAPÍTULO 4E — SEM ARMA",
-      texto: `Você se esconde atrás da porta, mas está desarmado. Quando o Grabber entra, você tenta agarrá-lo, mas ele é forte demais e te derruba no chão!`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Levantar e atender o telefone]", destino: "cap4a" },
-        { texto: "🔘 [Ficar no chão sem forças]", destino: "cap5k" }
-      ]
-    },
+  prologo: {
+    id: "prologo",
+    titulo: "🎬 PRÓLOGO — Antes de Iniciar",
+    texto: `Denver, Colorado — 1978.
+A cidade está assustada. Nas últimas semanas, cinco garotos desapareceram sem deixar rastro. As crianças comentam na escola, os adultos ficam em silêncio. Todo mundo sabe: o Grabber está à solta.
 
-    cap4f: {
-      id: "cap4f",
-      titulo: "📖 CAPÍTULO 4F — QUEBRANDO A JANELA",
-      texto: `Você arremessa o vaso e quebra o vidro da janela! Uma vizinha ouve o barulho, mas o Grabber entra no porão furioso com uma faca!`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Continuar gritando por socorro]", destino: "cap5l" },
-        { texto: "🔘 [Tentar fugir pela janela quebrada]", destino: "cap5m" },
-        { texto: "🔘 [Atacar o Grabber com o vidro]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" }
-      ]
-    },
-  
-    cap4g: {
-      id: "cap4g",
-      titulo: "📖 CAPÍTULO 4G — ARRANCANDO AS GRADES",
-      texto: `Você solta uma das grades da janela com as mãos sangrando, mas as outras continuam firmes.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Largar as grades e atender o telefone]", destino: "cap4a" },
-        { texto: "🔘 [Continuar tentando puxar as grades]", destino: "cap5n" }
-      ]
-    },
-  
-    cap5a: {
-      id: "cap5a",
-      titulo: "📖 CAPÍTULO 5A — ACEITAR A COMIDA",
-      texto: `Você come o pão duro e bebe a água. O Grabber se retira satisfeito. Em seguida, o telefone toca.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Ignorar e tentar dormir]", destino: "cap6b" }
-      ]
-    },
-  
-    cap5b: {
-      id: "cap5b",
-      titulo: "📖 CAPÍTULO 5B — CUSPIR NO GRABBER",
-      texto: `Você cospe na máscara dele! Ele te acerta um soco violento no estômago e promete voltar para te fazer implorar.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Tentar respirar e atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Ficar no chão chorando]", destino: "cap6c" }
-      ]
-    },
-  
-    cap5c: {
-      id: "cap5c",
-      titulo: "📖 CAPÍTULO 5C — PEGAR A CHAVE",
-      texto: `Você tenta pegar a chave do bolso dele, mas ele torce seu pulso e te joga no chão antes de sair!`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Levantar e atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Ficar no chão derrotado]", destino: "cap6d" }
-      ]
-    },
-  
-    cap5d: {
-      id: "cap5d",
-      titulo: "📖 CAPÍTULO 5D — TELEFONE CORTADO",
-      texto: `O Grabber vê o telefone destruído no chão e fica furioso: "O QUE VOCÊ FEZ?"`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Correr para a porta aberta]", destino: "cap6e" },
-        { texto: "🔘 [Atacar com o vidro afiado]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" }
-      ]
-    },
-  
-    cap5e: {
-      id: "cap5e",
-      titulo: "📖 CAPÍTULO 5E — MENTIR",
-      texto: `Você diz que não ouviu nada. Ele te chama de mentiroso e arranca o telefone da parede com violência!`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Atacá-lo com o vidro quando ele se aproximar]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Implorar por sua vida]", destino: "cap6f" }
-      ]
-    },
-  
-    cap5f: {
-      id: "cap5f",
-      titulo: "📖 CAPÍTULO 5F — PERGUNTAR SOBRE AS VÍTIMAS",
-      texto: `Você pergunta sobre os outros meninos. Ele ri e diz que você é diferente porque não chora, prometendo 'brincar' em breve.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Chorar e perder as forças]", destino: "cap6c" }
-      ]
-    },
-  
-    cap5g: {
-      id: "cap5g",
-      titulo: "📖 CAPÍTULO 5G — ATACAR COM O VIDRO",
-      texto: `Você finca o vidro afiado no pescoço do Grabber! Ele cai no chão sangrando. A CHAVE PRATEADA está visível no bolso dele!`,
-      isRinging: false,
-      addItem: "Chave Prateada",
-      botoes: [
-        { texto: "🔘 [Pegar a chave no bolso dele e fugir]", destino: "cap6g" },
-        { texto: "🔘 [Continuar atacando até ele parar]", destino: "cap6h" },
-        { texto: "🔘 [Correr para a janela quebrada]", destino: "cap6i" }
-      ]
-    },
-  
-    cap5h: {
-      id: "cap5h",
-      titulo: "📖 CAPÍTULO 5H — ABRIR A FECHADURA",
-      texto: `O vidro quebra na fechadura. O Grabber entra e nota o estrago na porta.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Tentar correr por entre as pernas dele]", destino: "cap6j" },
-        { texto: "🔘 [Ficar parado encarando-o]", destino: "cap6k" }
-      ]
-    },
-  
-    cap5i: {
-      id: "cap5i",
-      titulo: "📖 CAPÍTULO 5I — ABRIR OS OLHOS",
-      texto: `O Grabber segura uma faca e propõe um jogo de perguntas e respostas valendo sua vida.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Aceitar o jogo]", destino: "cap6l" },
-        { texto: "🔘 [Recusar e tentar fugir]", destino: "cap6m" }
-      ]
-    },
-  
-    cap5j: {
-      id: "cap5j",
-      titulo: "📖 CAPÍTULO 5J — CONTINUAR FINGINDO",
-      texto: `Você fica imóvel até ele desistir e sair trancando a porta. O telefone volta a tocar.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Esperar mais um pouco com medo]", destino: "cap6n" }
-      ]
-    },
-  
-    cap5k: {
-      id: "cap5k",
-      titulo: "📖 CAPÍTULO 5K — CHORAR DE DOR",
-      texto: `Você chora de dor no chão. O Grabber ri do seu desespero e sai. O telefone toca ao fundo.`,
-      isRinging: true,
-      botoes: [
-        { texto: "🔘 [Limpar o rosto e atender o telefone]", destino: "cap6a" },
-        { texto: "🔘 [Ficar no chão sem forças]", destino: "cap6d" }
-      ]
-    },
-  
-    cap5l: {
-      id: "cap5l",
-      titulo: "📖 CAPÍTULO 5L — CONTINUAR GRITANDO",
-      texto: `Você grita e atrai a vizinhança! O Grabber te prende com FITA ADESIVA na boca para se calar!`,
-      isRinging: false,
-      addItem: "Fita Adesiva na Boca",
-      botoes: [
-        { texto: "🔘 [Tentar soltar a fita adesiva]", destino: "cap6o" },
-        { texto: "🔘 [Ficar quieto e esperar]", destino: "cap6b" }
-      ]
-    },
-  
-    cap5m: {
-      id: "cap5m",
-      titulo: "📖 CAPÍTULO 5M — FUGIR PELA JANELA",
-      texto: `Você passa pela janela cortando a pele e cai no quintal escuro! O Grabber pula atrás de você!`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Correr para a rua]", destino: "cap6p" },
-        { texto: "🔘 [Esconder-se no quintal]", destino: "cap6q" }
-      ]
-    },
-  
-    cap5n: {
-      id: "cap5n",
-      titulo: "📖 CAPÍTULO 5N — TENTAR AS GRADES",
-      texto: `Você puxa as grades até desmaiar de exaustão. Quando acorda, o Grabber está te observando curioso.`,
-      isRinging: false,
-      botoes: [
-        { texto: "🔘 [Levantar e enfrentá-lo]", destino: "cap5g", reqItem: "Pedaço de Vidro Afiado" },
-        { texto: "🔘 [Implorar por sua vida]", destino: "cap6f" }
-      ]
-    },
-  
-    // ==========================================
-    // OS 17 FINAIS COMPLETOS (6A ATÉ 6Q)
-    // ==========================================
-    cap6a: {
-      id: "cap6a",
-      isEnding: true,
-      endingId: "6A",
-      titulo: "🏆 FINAL 6A — A VOZ DE GWEN (RESGATE)",
-      texto: `Gwen liga pelo telefone desconectado! Ela sonhou com a casa e guiou a polícia até o local. As sirenes chegam e você é resgatado vivo!
-  
-  FIM. Você sobreviveu!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6b: {
-      id: "cap6b",
-      isEnding: true,
-      endingId: "6B",
-      titulo: "🏆 FINAL 6B — SILÊNCIO (FINAL AMBÍGUO)",
-      texto: `Você acorda e encontra a porta entreaberta. A casa está deserta e o Grabber sumiu. Você caminha de volta para casa sob o sol, mas carregando marcas eternas.
-  
-  FIM. Nem tudo tem uma resposta.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6c: {
-      id: "cap6c",
-      isEnding: true,
-      endingId: "6C",
-      titulo: "💀 FINAL 6C — DERROTA (FINAL TRÁGICO)",
-      texto: `Você chora até adormecer no chão frio. O Grabber retorna nas sombras e você não tem forças para lutar.
-  
-  FIM. O Grabber venceu.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6d: {
-      id: "cap6d",
-      isEnding: true,
-      endingId: "6D",
-      titulo: "💀 FINAL 6D — SEM ESPERANÇA (FINAL TRÁGICO)",
-      texto: `O medo tomou conta de você. Quando o Grabber volta, você não reage.
-  
-  FIM. A esperança foi perdida.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6e: {
-      id: "cap6e",
-      isEnding: true,
-      endingId: "6E",
-      titulo: "💀 FINAL 6E — CORRIDA PARA A PORTA",
-      texto: `Você tenta correr pela porta aberta, mas o Grabber te agarra pela camisa e a tranca novamente.
-  
-  FIM. A liberdade estava tão perto.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6f: {
-      id: "cap6f",
-      isEnding: true,
-      endingId: "6F",
-      titulo: "💀 FINAL 6F — IMPLORAR (FINAL TRÁGICO)",
-      texto: `Você implora por sua vida, mas o Grabber sorri por baixo da máscara e diz que todo mundo promete mentiras.
-  
-  FIM. Implorar não adiantou.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6g: {
-      id: "cap6g",
-      isEnding: true,
-      endingId: "6G",
-      titulo: "🏆 FINAL 6G — FUGA COM A CHAVE",
-      texto: `Você pega a Chave Prateada do bolso do Grabber ferido, destranca a porta de metal e corre descalço pela rua até ser resgatado!
-  
-  FIM. Você venceu e escapou!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6h: {
-      id: "cap6h",
-      isEnding: true,
-      endingId: "6H",
-      titulo: "🏆 FINAL 6H — FINAL SOMBRIO",
-      texto: `No desespero da luta, você derrota o Grabber de vez com o vidro. A polícia chega e te resgata, mas o porão mudou você para sempre.
-  
-  FIM. Sobreviver é apenas o começo.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6i: {
-      id: "cap6i",
-      isEnding: true,
-      endingId: "6I",
-      titulo: "💀 FINAL 6I — JANELA QUEBRADA",
-      texto: `Você hesita ao ver os cacos de vidro na janela e o Grabber se recupera te agarrando pela cintura.
-  
-  FIM. A hesitação custou caro.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6j: {
-      id: "cap6j",
-      isEnding: true,
-      endingId: "6J",
-      titulo: "🏆 FINAL 6J — CORRER POR ENTRE AS PERNAS",
-      texto: `Você desliza por entre as pernas do sequestrador, dispara pelas escadas e ganha a rua gritando até ser acolhido por vizinhos!
-  
-  FIM. A agilidade te salvou!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6k: {
-      id: "cap6k",
-      isEnding: true,
-      endingId: "6K",
-      titulo: "🏆 FINAL 6K — ENCARAR",
-      texto: `Você encara o Grabber sem mostrar medo. Surpreso com sua coragem, ele se afasta e deixa a porta aberta.
-  
-  FIM. Coragem diante do horror.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6l: {
-      id: "cap6l",
-      isEnding: true,
-      endingId: "6L",
-      titulo: "💀 FINAL 6L — O JOGO",
-      texto: `Você responde à pergunta do jogo do Grabber dizendo que ele é apenas um monstro. Ele ri e encerra a brincadeira.
-  
-  FIM. Alguns jogos não podem ser vencidos.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6m: {
-      id: "cap6m",
-      isEnding: true,
-      endingId: "6M",
-      titulo: "🏆 FINAL 6M — RECUSAR E FUGIR",
-      texto: `Você recusa o jogo, acerta a máscara dele com uma cotovelada e arromba a fechadura no chute escapando para a liberdade!
-  
-  FIM. Você lutou e venceu!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6n: {
-      id: "cap6n",
-      isEnding: true,
-      endingId: "6N",
-      titulo: "🏆 FINAL 6N — ESPERAR (MISTERIOSO)",
-      texto: `A porta do porão se abre sozinha. A casa está vazia e você caminha para a rua sem nunca mais ver o sequestrador.
-  
-  FIM. Algumas perguntas nunca têm resposta.`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6o: {
-      id: "cap6o",
-      isEnding: true,
-      endingId: "6O",
-      titulo: "🏆 FINAL 6O — SOLTAR A FITA",
-      texto: `Você arranca a fita adesiva dos lábios e grita por socorro! A polícia invade o local e prende o Grabber no quintal!
-  
-  FIM. Você foi resgatado!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6p: {
-      id: "cap6p",
-      isEnding: true,
-      endingId: "6P",
-      titulo: "🏆 FINAL 6P — CORRER PARA A RUA",
-      texto: `Você corre desesperadamente para a rua iluminada. Um motorista te ajuda e a polícia prende o Grabber naquela noite!
-  
-  FIM. Fuga perfeita!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    },
-  
-    cap6q: {
-      id: "cap6q",
-      isEnding: true,
-      endingId: "6Q",
-      titulo: "🏆 FINAL 6Q — ESCONDER-SE (FUGA FURTIVA)",
-      texto: `Você se esconde atrás do barril de metal. O Grabber passa direto e você pula a cerca para pedir socorro na casa vizinha!
-  
-  FIM. Você foi esperto e se escondeu bem!`,
-      botoes: [{ texto: "🔄 [JOGAR NOVAMENTE]", destino: "prologo" }]
-    }
-  };
+Você é Finney Shaw, 13 anos. Você não é o mais forte nem o mais popular da escola, mas é observador e esperto. Sua irmã Gwen tem tido sonhos estranhos — sonhos que mostram coisas reais que ainda vão acontecer.
+
+Esta noite, Gwen sonhou com você preso num porão escuro, onde um telefone preto tocava na parede. O telefone vai tocar... e as vozes do outro lado vão falar com você.`,
+    isRinging: false,
+    botoes: [{ texto: "🔘 [COMEÇAR A JORNADA]", destino: "cap1" }]
+  },
+
+  cap1: {
+    id: "cap1",
+    titulo: "📖 CAPÍTULO 1 — O DESPERTAR",
+    texto: `Você acorda num porão frio com cheiro de poeira e mofo. A luz entra por uma fresta embaixo da porta de metal trancada. Você está num colchão fino deitado no chão de concreto.
+
+Na parede de tijolos, acima do colchão, há um telefone preto de disco antigo. O fio está cortado e pendurado no ar. É impossível que ele funcione.
+
+Repentinamente, o telefone começa a tocar: RIINNG! RIINNG!
+O som ecoa pelas paredes frias.`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Atender o telefone imediatamente]", destino: "cap_bruce" },
+      { texto: "🔘 [Ignorar o som e procurar uma saída]", destino: "cap2b" },
+      { texto: "🔘 [Gritar por socorro na porta]", destino: "cap2c" }
+    ]
+  },
+
+  cap_bruce: {
+    id: "cap_bruce",
+    callId: "bruce",
+    callName: "Bruce Yamada",
+    titulo: "📞 1ª LIGAÇÃO — BRUCE YAMADA (BEISEBOL)",
+    texto: `Você atende o fone frio. Uma voz jovem e cansada fala com chiado:
+
+"Ei... sou eu, Bruce Yamada. O garoto do beisebol. Eu estive nesse mesmo porão. O Grabber me pegou no caminho da escola...
+Escuta, Finney! O concreto sob o tapete velho ao lado da cama é de terra batida macia. Comecei a cavar um buraco lá antes dele voltar. Cave a terra e guarde-a!"
+
+A ligação cai com um estalo metálico.`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Cavar e PEGAR a terra batida sob o tapete]", getItem: "Terra do Porão", destino: "cap_billy" },
+      { texto: "🔘 [Ignorar a dica e procurar outra coisa no chão]", destino: "cap3a" },
+      { texto: "🔘 [Tentar arrombar a porta de metal]", destino: "cap3c" }
+    ]
+  },
+
+  cap_billy: {
+    id: "cap_billy",
+    callId: "billy",
+    callName: "Billy Showalter",
+    titulo: "📞 2ª LIGAÇÃO — BILLY SHOWALTER (ENTREGADOR)",
+    texto: `O telefone toca de novo. Você atende rapidamente.
+
+"Finney? Aqui é o Billy Showalter, o entregador de jornal... O Grabber usou o cão dele pra me encurralar.
+Eu deixei algo pra você! Na fresta da parede de tijolos, do lado direito do vaso sanitário, eu escondi um cabo de aço trançado que achei no chão. Encontre esse cabo, você vai precisar dele!"`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Procurar na fresta e PEGAR o cabo de aço trançado]", getItem: "Cabo de Aço Trançado", destino: "cap_griffin" },
+      { texto: "🔘 [Procurar algo solto no chão do porão]", destino: "cap3a" },
+      { texto: "🔘 [Olhar para a janela alta no teto]", destino: "cap3d" }
+    ]
+  },
+
+  cap_griffin: {
+    id: "cap_griffin",
+    callId: "griffin",
+    callName: "Griffin Stinnett",
+    titulo: "📞 3ª LIGAÇÃO — GRIFFIN STINNETT (O CADEADO)",
+    texto: `Outra ligação entra no telefone desconectado. A voz do pequeno Griffin fala assustada:
+
+"Finney... sou o Griffin. Eu decorava códigos e senhas. A porta de metal do porão tem um cadeado pesado por fora. A combinação é: 33-45-27.
+Mas tome cuidado! Ele costuma dormir na cadeira de balanço no topo da escada durante o 'Jogo do Sono'. Se fizer barulho ao abrir o cadeado, ele acorda!"`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Anotar mentalmente a combinação e continuar explorando]", destino: "cap3a" },
+      { texto: "🔘 [Ir até a porta e tentar abrir o CADEADO]", destino: "cap_padlock" }
+    ]
+  },
+
+  cap3a: {
+    id: "cap3a",
+    titulo: "📖 CAPÍTULO 3A — A PEDRA SOLTA NO CHÃO",
+    texto: `Você passa os dedos pelas frestas do chão de concreto frio. Sob uma pedra solta perto do canto, você sente algo pontiagudo enrolado num Pedaço de Vidro Afiado!`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Procurar e PEGAR o pedaço de vidro afiado no buraco]", getItem: "Pedaço de Vidro Afiado", destino: "cap_vance" },
+      { texto: "🔘 [Deixar a pedra no lugar e esperar]", destino: "cap4b" }
+    ]
+  },
+
+  cap_vance: {
+    id: "cap_vance",
+    callId: "vance",
+    callName: "Vance Hopper",
+    titulo: "📞 4ª LIGAÇÃO — VANCE HOPPER (O FLIPERAMA)",
+    texto: `O telefone vibra de novo com uma voz irritada e firme:
+
+"Finney! É o Vance Hopper! Aquele miserável me trancou aqui, mas eu quebrei a parede de gesso atrás do vaso sanitário!
+Ela dá acesso direto ao duto de ventilação do freezer da cozinha. Se você tiver algo afiado pra cortar o gesso, dá pra rastejar por lá!"`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Ir para a parede de gesso tentar quebrar o duto]", reqItem: "Pedaço de Vidro Afiado", destino: "cap_vance_duct" },
+      { texto: "🔘 [Aguardar a próxima ligação no telefone]", destino: "cap_robin" }
+    ]
+  },
+
+  cap_robin: {
+    id: "cap_robin",
+    callId: "robin",
+    callName: "Robin Arellano",
+    titulo: "📞 5ª LIGAÇÃO — ROBIN ARELLANO (O LUTADOR)",
+    texto: `A voz do seu melhor amigo Robin soa firme no fone:
+
+"Finney! Sou eu, o Robin! Você precisa lutar, cara! Não dá pra fugir sem encarar ele!
+Presta atenção na receita pra criar uma arma: pegue a terra do porão, encha o fone do telefone preto até ficar bem pesado, e amarre tudo bem firme com o cabo de aço!
+Isso transforma o fone numa clava pesada de impacto! Quando ele entrar, acerte a cabeça dele com força!"`,
+    isRinging: true,
+    botoes: [
+      {
+        texto: "🔨 [CRIAR TELEFONE PESADO (Exige: Terra do Porão + Cabo de Aço)]",
+        reqItems: ["Terra do Porão", "Cabo de Aço Trançado"],
+        consumeItems: ["Terra do Porão", "Cabo de Aço Trançado"],
+        getItem: "Telefone Pesado de Impacto",
+        destino: "cap_ready_fight"
+      },
+      { texto: "🔘 [Guardar os itens e esperar o Grabber entrar]", destino: "cap4d" }
+    ]
+  },
+
+  cap_padlock: {
+    id: "cap_padlock",
+    titulo: "🔐 CADEADO DA PORTA DE METAL",
+    texto: `Você sobe os degraus e alcança a porta de metal. Por uma fresta, você enxerga o cadeado de combinação pesada.
+
+Lembre-se da combinação que Griffin Stinnett lhe disse no telefone e digite os 6 dígitos corretos no painel!`,
+    isRinging: false,
+    minigamePadlock: true,
+    botoes: []
+  },
+
+  cap_padlock_open: {
+    id: "cap_padlock_open",
+    titulo: "🚪 A PORTA SE ABRIU EM SILÊNCIO",
+    texto: `O cadeado destranca com um clique suave. Você empurra a porta devagar.
+
+No topo da escada de madeira, o Grabber está sentado numa cadeira de balanço, dormindo com a máscara de diabo no rosto durante o 'Jogo do Sono'. A porta da frente da casa está a poucos metros.`,
+    isRinging: false,
+    botoes: [
+      {
+        texto: "🎲 [AÇÃO FÍSICA] Passar furtivamente pela cadeira de balanço (D6 | Alvo 3+)",
+        diceCheck: {
+          desc: "Manobra furtiva para subir os degraus de madeira sem fazer ranger",
+          target: 3,
+          success: "cap6r",
+          fail: "cap6e"
+        }
+      }
+    ]
+  },
+
+  cap_vance_duct: {
+    id: "cap_vance_duct",
+    titulo: "🛠️ O DUTO DE VENTILAÇÃO DE VANCE",
+    texto: `Usando o Pedaço de Vidro Afiado, você rasga o gesso velho atrás do vaso e expõe a grelha de metal do duto que leva à cozinha.`,
+    isRinging: false,
+    botoes: [
+      {
+        texto: "🎲 [AÇÃO FÍSICA] Rastejar pelo duto estreito (D6 | Alvo 4+)",
+        reqItem: "Pedaço de Vidro Afiado",
+        diceCheck: {
+          desc: "Forçar a passagem pelo duto de ventilação estreito",
+          target: 4,
+          success: "cap6s",
+          fail: "cap6i"
+        }
+      }
+    ]
+  },
+
+  cap_ready_fight: {
+    id: "cap_ready_fight",
+    titulo: "🥊 PREPARADO PARA O CONFRONTO",
+    texto: `Você recheou o fone do Telefone Preto com a terra batida e amarrou com o cabo de aço trançado de Billy. Agora você tem o TELEFONE PESADO DE IMPACTO!
+
+Passos pesados ecoam na escada. A porta se abre. O Grabber entra usando a máscara de diabo.`,
+    isRinging: false,
+    botoes: [
+      {
+        texto: "🎲 [AÇÃO FÍSICA] Golpear a máscara com o Telefone Pesado (D6 | Alvo 3+)",
+        reqItem: "Telefone Pesado de Impacto",
+        diceCheck: {
+          desc: "Acertar um golpe devastador com o Telefone Pesado no Grabber",
+          target: 3,
+          success: "cap5g_heavy",
+          fail: "cap5b"
+        }
+      },
+      { texto: "🔘 [Tentar enganar o Grabber com mentiras]", destino: "cap5i" }
+    ]
+  },
+
+  cap5g_heavy: {
+    id: "cap5g_heavy",
+    titulo: "💥 O GOLPE CERTEIRO!",
+    texto: `O impacto do Telefone Pesado despedaça a máscara do Grabber! Ele cai de joelhos, tonto e sangrando no chão de concreto.
+
+A Chave Prateada cai do bolso do casaco dele no chão.`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [PEGA a Chave Prateada no chão e corre para a porta]", getItem: "Chave Prateada", destino: "cap6g" },
+      { texto: "🔘 [Continuar golpeando até ele parar de se mexer]", destino: "cap6h" }
+    ]
+  },
+
+  cap2b: {
+    id: "cap2b",
+    titulo: "📖 CAPÍTULO 2B — EXPLORANDO O PORÃO",
+    texto: `Você ignora o telefone e tateia as paredes frias. A porta é de metal maciço e a janela está muito alta. O telefone continua tocando de forma insistente.`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Voltar e atender o telefone]", destino: "cap_bruce" },
+      { texto: "🔘 [Tentar alcançar a janela empilhando o colchão]", destino: "cap3d" }
+    ]
+  },
+
+  cap2c: {
+    id: "cap2c",
+    titulo: "📖 CAPÍTULO 2C — GRITOS NO SILÊNCIO",
+    texto: `Você grita por socorro até a garganta doer. O porão é totalmente isolado acusticamente. Ninguém escuta do lado de fora. O telefone toca na parede.`,
+    isRinging: true,
+    botoes: [
+      { texto: "🔘 [Atender o telefone]", destino: "cap_bruce" },
+      { texto: "🔘 [Chutar a porta com raiva]", destino: "cap3c" }
+    ]
+  },
+
+  cap3c: {
+    id: "cap3c",
+    titulo: "📖 CAPÍTULO 3C — CHUTES NA PORTA",
+    texto: `Você chuta a porta de metal. O barulho ecoa e você ouve passos pesados descendo a escada de madeira!`,
+    isRinging: false,
+    addFear: 25,
+    botoes: [
+      { texto: "🔘 [Deitar no colchão e fingir que está dormindo]", destino: "cap4d" },
+      { texto: "🔘 [Esperar atrás da porta para atacar]", destino: "cap4e" }
+    ]
+  },
+
+  cap3d: {
+    id: "cap3d",
+    titulo: "📖 CAPÍTULO 3D — A JANELA DO PORÃO",
+    texto: `Você olha para a janela no alto. O vidro é grosso e há grades de ferro enferrujadas.`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Tentar quebrar o vidro com um vaso sanitário solto]", destino: "cap4f" },
+      { texto: "🔘 [Voltar para o chão e procurar itens]", destino: "cap3a" }
+    ]
+  },
+
+  cap4b: {
+    id: "cap4b",
+    titulo: "📖 CAPÍTULO 4B — A MÁSCARA DO DIABO",
+    texto: `O Grabber entra no porão usando a máscara de diabo. Ele encara você e Pergunta: 'Por que você não atendeu o telefone?'`,
+    isRinging: false,
+    addFear: 20,
+    botoes: [
+      { texto: "🔘 [Mentir: 'Eu não ouvi nada']", destino: "cap5e" },
+      { texto: "🔘 [Perguntar sobre as outras crianças]", destino: "cap5f" }
+    ]
+  },
+
+  cap4d: {
+    id: "cap4d",
+    titulo: "📖 CAPÍTULO 4D — FINGIR DORMIR",
+    texto: `Você se deita e fecha os olhos. O Grabber entra, toca no seu ombro e diz com voz rouca: 'Acorda, garoto. Hora de brincar...'`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Abrir os olhos e encarar o questionário dele]", destino: "cap5i" }
+    ]
+  },
+
+  cap4e: {
+    id: "cap4e",
+    titulo: "📖 CAPÍTULO 4E — ATAQUE IMPULSIVO",
+    texto: `Você se esconde atrás da porta e avança no Grabber, mas ele te empurra com violência contra o concreto!`,
+    isRinging: false,
+    addFear: 30,
+    botoes: [
+      { texto: "🔘 [Atender o telefone que começa a tocar]", destino: "cap_bruce" },
+      { texto: "🔘 [Ficar no chão recuperando o fôlego]", destino: "cap5k" }
+    ]
+  },
+
+  cap4f: {
+    id: "cap4f",
+    titulo: "📖 CAPÍTULO 4F — VIDRO QUEBRADO",
+    texto: `O barulho da janela quebrando atrai a atenção do Grabber, que desce as escadas furioso com uma faca!`,
+    isRinging: false,
+    addFear: 35,
+    botoes: [
+      { texto: "🔘 [Tentar subir e fugir pela janela quebrada]", destino: "cap5m" }
+    ]
+  },
+
+  cap5b: {
+    id: "cap5b",
+    titulo: "📖 CAPÍTULO 5B — RESPOSTA VIOLENTA",
+    texto: `O Grabber acerta um soco no seu estômago. Você cai sem ar no chão.`,
+    isRinging: false,
+    addFear: 40,
+    botoes: [
+      { texto: "🔘 [Tentar se levantar e atender o telefone]", destino: "cap6a" },
+      { texto: "🔘 [Chorar de dor no chão]", destino: "cap6c" }
+    ]
+  },
+
+  cap5e: {
+    id: "cap5e",
+    titulo: "📖 CAPÍTULO 5E — O TELEFONE ARRANCADO",
+    texto: `O Grabber arranca o telefone da parede com raiva. 'Agora você está sozinho!', ele diz antes de trancar a porta.`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Implorar por sua vida]", destino: "cap6f" },
+      { texto: "🔘 [Esperar em silêncio no colchão]", destino: "cap6b" }
+    ]
+  },
+
+  cap5f: {
+    id: "cap5f",
+    titulo: "📖 CAPÍTULO 5F — AS OUTRAS VÍTIMAS",
+    texto: `Você pergunta dos outros meninos. O Grabber ri e diz: 'Eles choraram... mas você é diferente.'`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Atender o telefone que volta a tocar]", destino: "cap6a" }
+    ]
+  },
+
+  cap5i: {
+    id: "cap5i",
+    titulo: "🤡 A BRINCADEIRA DO GRABBER — PERGUNTA 1",
+    texto: `O Grabber senta na sua frente jogando uma faca para o alto.
+
+"Vamos jogar uma brincadeira! Se você acertar minhas perguntas, eu penso no seu caso.
+Primeira pergunta: O que as vozes do telefone sem fio te disseram?"`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Mentir: 'Elas disseram que você é fraco']", destino: "quiz_q2" },
+      { texto: "🔘 [Falar a verdade sobre a dica da pedra]", destino: "cap6l" }
+    ]
+  },
+
+  quiz_q2: {
+    id: "quiz_q2",
+    titulo: "🤡 A BRINCADEIRA DO GRABBER — PERGUNTA 2",
+    texto: `O Grabber estreita os olhos por trás da máscara.
+
+"Interessante... Segunda pergunta: O que você tem escondido debaixo do colchão?"`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Responder: 'Não tem nada lá!']", destino: "quiz_q3" },
+      { texto: "🔘 [Atacar o rosto dele com o Pedaço de Vidro Afiado]", reqItem: "Pedaço de Vidro Afiado", destino: "cap5g_heavy" }
+    ]
+  },
+
+  quiz_q3: {
+    id: "quiz_q3",
+    titulo: "🤡 A BRINCADEIRA DO GRABBER — PERGUNTA 3",
+    texto: `O Grabber se aproxima do seu rosto.
+
+"Última pergunta: Qual máscara eu uso quando fico furioso de verdade?"`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Responder: 'A Máscara do Diabo!']", destino: "quiz_success" },
+      { texto: "🔘 [Responder: 'A Máscara do Sapo!']", destino: "cap6l" }
+    ]
+  },
+
+  quiz_success: {
+    id: "quiz_success",
+    titulo: "😮 O GRABBER FICOU CHOCADO!",
+    texto: `O Grabber recua surpreso! 'Como você sabe disso?!'
+Na confusão, ele deixa a Chave Prateada escorregar do bolso para o chão!`,
+    isRinging: false,
+    botoes: [
+      { texto: "🔘 [Pegar a Chave Prateada e correr para a porta]", getItem: "Chave Prateada", destino: "cap6g" }
+    ]
+  },
+
+  cap5k: {
+    id: "cap5k",
+    titulo: "📖 CAPÍTULO 5K — DOR E MEDO",
+    texto: `Você fica no chão chorando de dor. O som do telefone parece distante.`,
+    isRinging: true,
+    addFear: 20,
+    botoes: [
+      { texto: "🔘 [Limpar o rosto e atender o telefone]", destino: "cap6a" },
+      { texto: "🔘 [Desistir de tudo]", destino: "cap6d" }
+    ]
+  },
+
+  cap5m: {
+    id: "cap5m",
+    titulo: "📖 CAPÍTULO 5M — SUBINDO PELA JANELA",
+    texto: `Você pula pelo vaso sanitário e cai no quintal molhado da casa!`,
+    isRinging: false,
+    botoes: [
+      {
+        texto: "🎲 [AÇÃO FÍSICA] Correr para a rua (D6 | Alvo 3+)",
+        diceCheck: {
+          desc: "Correr pela grama molhada até alcançar a rua iluminada",
+          target: 3,
+          success: "cap6p",
+          fail: "cap6q"
+        }
+      }
+    ]
+  },
+
+  cap6a: {
+    id: "cap6a",
+    isEnding: true,
+    endingId: "6A",
+    titulo: "🏆 FINAL 6A — A VOZ DE GWEN (RESGATE)",
+    texto: `Você atende o telefone e ouve a voz de Gwen! Ela conta que os policiais viram o porão nos sonhos dela. Sirenes dobram a esquina e a polícia arromba a casa. Você é salvo!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6b: {
+    id: "cap6b",
+    isEnding: true,
+    endingId: "6B",
+    titulo: "🏆 FINAL 6B — SILÊNCIO NO PORÃO",
+    texto: `Ao amanhecer, a porta está aberta e a casa está completamente vazia. Você caminha para fora sem encontrar ninguém. O Grabber sumiu para sempre.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6c: {
+    id: "cap6c",
+    isEnding: true,
+    endingId: "6C",
+    titulo: "💀 FINAL 6C — DERROTA NO CHÃO FRIO",
+    texto: `O cansaço e o medo vencem Finney. O Grabber retorna no silêncio da noite.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6d: {
+    id: "cap6d",
+    isEnding: true,
+    endingId: "6D",
+    titulo: "💀 FINAL 6D — SEM ESPERANÇA",
+    texto: `Sem forças para lutar, Finney se rende ao destino no porão.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6e: {
+    id: "cap6e",
+    isEnding: true,
+    endingId: "6E",
+    titulo: "💀 FINAL 6E — CAPTURADO NA ESCADA",
+    texto: `Um degrau de madeira range sob seu pé! O Grabber acorda num pulo e te agarra antes que você alcance a porta da frente!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6f: {
+    id: "cap6f",
+    isEnding: true,
+    endingId: "6F",
+    titulo: "💀 FINAL 6F — IMPLORAR POR VIDA",
+    texto: `Você implora por misericórdia, mas o sequestrador não demonstra piedade.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6g: {
+    id: "cap6g",
+    isEnding: true,
+    endingId: "6G",
+    titulo: "🏆 FINAL 6G — FUGA COM A CHAVE PRATEADA",
+    texto: `Com a Chave Prateada na mão, você destranca a porta, sobe as escadas correndo e ganha a rua descalço! A polícia te acolhe a três quarteirões dali!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6h: {
+    id: "cap6h",
+    isEnding: true,
+    endingId: "6H",
+    titulo: "🏆 FINAL 6H — FINAL SOMBRIO (LUTA)",
+    texto: `Você combate o sequestrador com fúria até garantir que ele não se levante mais. A polícia chega e encontra Finney salvo, porém transformado pela luta.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6i: {
+    id: "cap6i",
+    isEnding: true,
+    endingId: "6I",
+    titulo: "💀 FINAL 6I — CORTE NA JANELA",
+    texto: `A hesitação diante dos cacos de vidro dá tempo para o Grabber te alcançar na janela.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6j: {
+    id: "cap6j",
+    isEnding: true,
+    endingId: "6J",
+    titulo: "🏆 FINAL 6J — FUGA POR ENTRE AS PERNAS",
+    texto: `Sendo pequeno e ágil, você desliza por entre as pernas do sequestrador e ganha a porta da rua! A vizinha chama a polícia imediatamente.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6k: {
+    id: "cap6k",
+    isEnding: true,
+    endingId: "6K",
+    titulo: "🏆 FINAL 6K — ENCARAR O SEQUESTRADOR",
+    texto: `Você encara os olhos da máscara sem demonstrar medo. Impressionado com a coragem, ele se retira.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6l: {
+    id: "cap6l",
+    isEnding: true,
+    endingId: "6L",
+    titulo: "💀 FINAL 6L — O JOGO DE PERGUNTAS",
+    texto: `Você erra a resposta do questionário e o Grabber encerra a brincadeira.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6m: {
+    id: "cap6m",
+    isEnding: true,
+    endingId: "6M",
+    titulo: "🏆 FINAL 6M — RECUSAR E ARROMBAR",
+    texto: `Você recusa o jogo, acerta uma cotovelada na máscara dele e chuta a porta de metal até arrombar!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6n: {
+    id: "cap6n",
+    isEnding: true,
+    endingId: "6N",
+    titulo: "🏆 FINAL 6N — A PORTA ABERTA",
+    texto: `A porta de metal se abre sozinha sem explicações. Você sobe as escadas e caminha livre para o amanhecer.`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6o: {
+    id: "cap6o",
+    isEnding: true,
+    endingId: "6O",
+    titulo: "🏆 FINAL 6O — SOLTAR A FITA ADESIVA",
+    texto: `Você arranca a fita dos lábios e grita com todas as forças. A patrulha da polícia ouve e arromba a casa!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6p: {
+    id: "cap6p",
+    isEnding: true,
+    endingId: "6P",
+    titulo: "🏆 FINAL 6P — CORRER PARA A RUA",
+    texto: `Você corre pela grama até a rua e consegue carona com um motorista que chama a polícia!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6q: {
+    id: "cap6q",
+    isEnding: true,
+    endingId: "6Q",
+    titulo: "🏆 FINAL 6Q — FUGA FURTIVA NO QUINTAL",
+    texto: `Você se esconde atrás do barril de metal até o sequestrador passar reto. Em seguida, pula a cerca do vizinho!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6r: {
+    id: "cap6r",
+    isEnding: true,
+    endingId: "6R",
+    titulo: "🏆 FINAL 6R — O SEGREDO DE GRIFFIN (CADEADO)",
+    texto: `Usando a combinação de Griffin (33-45-27), a porta se abriu em silêncio! Você passou de mansinho ao lado da cadeira de balanço e saiu pela porta da frente sem acordar o Grabber!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  },
+
+  cap6s: {
+    id: "cap6s",
+    isEnding: true,
+    endingId: "6S",
+    titulo: "🏆 FINAL 6S — A ROTA DE VANCE (DUTO)",
+    texto: `Seguindo a dica de Vance Hopper, você rasgou o gesso e rastejou pelo duto de ventilação até a despensa da cozinha, escapando pela janela dos fundos!`,
+    botoes: [{ texto: "🔄 [Jogar Novamente]", destino: "prologo" }]
+  }
+};
