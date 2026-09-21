@@ -1,125 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sexta-Feira 13: O Pesadelo de Crystal Lake</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090a0d">
+  <title>Você Sobreviveria? — Crystal Lake</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="scanlines"></div>
-    <div id="skyline" aria-hidden="true">
-        <div class="moon"></div>
-        <div class="trees"></div>
+  <div id="scanlines" aria-hidden="true"></div>
+
+  <div id="game-container">
+    <header id="hud">
+      <div class="brand">
+        <span class="brand-kicker">VOCÊ SOBREVIVERIA?</span>
+        <strong>CRYSTAL LAKE</strong>
+      </div>
+
+      <div class="hud-stats" aria-label="Status do jogador">
+        <div class="hud-stat">
+          <span class="label">VIDA</span>
+          <span id="hp-display" class="value">10/10</span>
+          <div class="bar-container" aria-hidden="true"><div id="hp-bar" class="bar hp-fill"></div></div>
+        </div>
+        <div class="hud-stat">
+          <span class="label">STAMINA</span>
+          <span id="stamina-display" class="value">5/5</span>
+          <div class="bar-container" aria-hidden="true"><div id="stamina-bar" class="bar stamina-fill"></div></div>
+        </div>
+      </div>
+
+      <button id="trophy-button" class="trophy-button" type="button" aria-label="Ver troféus">
+        <span class="trophy-icon">🏆</span>
+        <span><b id="trophy-count">0</b>/4 finais</span>
+      </button>
+    </header>
+
+    <main id="main-content">
+      <div class="progress-row">
+        <span id="chapter-badge" class="badge">PRÓLOGO</span>
+        <span id="progress-text">Decisões: 0</span>
+      </div>
+
+      <section id="narrative-box" aria-live="polite">
+        <div id="scene-image-container">
+          <img id="scene-image" src="" alt="" class="hidden">
+          <div id="image-placeholder" class="image-fallback">
+            <span class="placeholder-mark">◼</span>
+            <span id="placeholder-text">ILUSTRAÇÃO DA CENA</span>
+          </div>
+        </div>
+
+        <div class="scene-heading">
+          <span class="scene-eyebrow">REGISTRO DE SOBREVIVÊNCIA</span>
+          <h1 id="scene-title">Carregando...</h1>
+        </div>
+
+        <div id="scene-text">Carregando a história...</div>
+
+        <div id="dice-banner" class="hidden" role="status">
+          <span id="dice-banner-text"></span>
+        </div>
+      </section>
+
+      <section id="choices-section">
+        <div class="choices-heading">
+          <span>O QUE VOCÊ FAZ?</span>
+          <small>Escolha com cuidado. Algumas decisões não têm volta.</small>
+        </div>
+        <section id="choices-container" aria-label="Escolhas da cena"></section>
+      </section>
+    </main>
+  </div>
+
+  <section id="dice-stage" class="hidden" aria-modal="true" role="dialog" aria-label="Teste de sorte">
+    <div class="dice-overlay">
+      <div class="dice-header">
+        <span class="dice-eyebrow">TESTE DE SOBREVIVÊNCIA</span>
+        <strong id="dice-status">O DADO ESTÁ ROLANDO...</strong>
+      </div>
+      <div class="scene-3d">
+        <div id="cube" class="cube">
+          <div class="face face-1"><span class="pip center"></span></div>
+          <div class="face face-2"><span class="pip top-left"></span><span class="pip bottom-right"></span></div>
+          <div class="face face-3"><span class="pip top-left"></span><span class="pip center"></span><span class="pip bottom-right"></span></div>
+          <div class="face face-4"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
+          <div class="face face-5"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip center"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
+          <div class="face face-6"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip mid-left"></span><span class="pip mid-right"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
+        </div>
+      </div>
+      <div class="dice-hint">D6 • cada resultado muda seu destino</div>
     </div>
+  </section>
 
-    <!-- ===================== TELA DE ABERTURA ===================== -->
-    <section id="screen-title" class="screen is-active">
-        <div class="title-wrap">
-            <h1 class="game-title">Sexta-Feira 13<span>O Pesadelo de Crystal Lake</span></h1>
-            <p class="tagline">É noite de tempestade em Crystal Lake. Suas escolhas decidem se você vê o amanhecer.</p>
-            <div class="title-actions">
-                <button id="btn-start" class="btn btn-primary">Começar a Noite</button>
-                <button id="btn-trophies" class="btn btn-secondary">
-                    Troféus <span id="trophy-count-badge" class="badge-count">0/4</span>
-                </button>
-            </div>
-            <p class="hint">Toque em uma opção para decidir o próximo passo. Alguns caminhos exigem sorte, coragem ou os itens certos.</p>
-        </div>
-    </section>
-
-    <!-- ===================== TELA DE TROFÉUS ===================== -->
-    <section id="screen-trophies" class="screen">
-        <div class="trophies-wrap">
-            <h2>Sala de Troféus</h2>
-            <p class="trophies-sub">Desfechos já descobertos neste acampamento: <strong id="trophy-progress">0/4</strong></p>
-            <div id="trophy-grid" class="trophy-grid"></div>
-            <button id="btn-back-title" class="btn btn-secondary">Voltar ao Início</button>
-        </div>
-    </section>
-
-    <!-- ===================== TELA DO JOGO ===================== -->
-    <div id="game-container" class="screen">
-
-        <header id="hud">
-            <div class="hud-stat">
-                <span class="label">Vida</span>
-                <span id="hp-display" class="value">10/10</span>
-                <div class="bar-container"><div id="hp-bar" class="bar hp-fill"></div></div>
-            </div>
-            <div class="hud-stat">
-                <span class="label">Fôlego</span>
-                <span id="stamina-display" class="value">5/5</span>
-                <div class="bar-container"><div id="stamina-bar" class="bar stamina-fill"></div></div>
-            </div>
-            <div class="hud-stat hud-inventory-group">
-                <span class="label">Mochila <span id="inv-count">0</span>/4</span>
-                <div id="inventory-list" class="inventory-slots"></div>
-            </div>
-            <div class="hud-stat hud-right">
-                <span id="chapter-badge" class="badge">PRÓLOGO</span>
-                <button id="btn-menu" class="btn-icon" title="Voltar ao menu">Menu</button>
-            </div>
-        </header>
-
-        <main id="main-content">
-
-            <section id="narrative-box">
-                <div id="scene-image-container">
-                    <img id="scene-image" src="" alt="Cena Atual" class="hidden">
-                    <div id="image-placeholder" class="image-fallback">
-                        <span id="placeholder-icon">🌲</span>
-                        <span id="placeholder-text">Crystal Lake</span>
-                    </div>
-                </div>
-
-                <h2 id="scene-title">Carregando...</h2>
-                <div id="scene-text">Carregando a história...</div>
-
-                <div id="dice-banner" class="hidden">
-                    <span id="dice-banner-text"></span>
-                </div>
-            </section>
-
-            <section id="dice-stage" class="hidden">
-                <div class="dice-overlay">
-                    <div class="scene-3d">
-                        <div id="cube" class="cube">
-                            <div class="face face-1"><span class="pip center"></span></div>
-                            <div class="face face-2"><span class="pip top-left"></span><span class="pip bottom-right"></span></div>
-                            <div class="face face-3"><span class="pip top-left"></span><span class="pip center"></span><span class="pip bottom-right"></span></div>
-                            <div class="face face-4"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
-                            <div class="face face-5"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip center"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
-                            <div class="face face-6"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip mid-left"></span><span class="pip mid-right"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
-                        </div>
-                    </div>
-                    <div id="dice-status">TESTANDO SUA SORTE...</div>
-                </div>
-            </section>
-
-            <section id="choices-container"></section>
-
-        </main>
+  <section id="trophy-modal" class="hidden" aria-modal="true" role="dialog" aria-labelledby="trophy-title">
+    <div class="modal-card">
+      <button id="close-trophy" class="close-button" type="button" aria-label="Fechar">×</button>
+      <span class="scene-eyebrow">COLEÇÃO</span>
+      <h2 id="trophy-title">Trofeus de Crystal Lake</h2>
+      <p class="modal-intro">Descubra todos os destinos possíveis. Seu progresso fica salvo neste navegador.</p>
+      <div id="trophy-list" class="trophy-list"></div>
+      <div class="completion-box">
+        <span>FINAIS DESCOBERTOS</span>
+        <strong><span id="modal-trophy-count">0</span>/4</strong>
+      </div>
     </div>
+  </section>
 
-    <!-- ===================== TELA DE FIM DE JOGO ===================== -->
-    <section id="screen-ending" class="screen">
-        <div class="ending-wrap">
-            <span id="ending-icon" class="ending-icon">🏆</span>
-            <p id="ending-kicker" class="ending-kicker">Final Bom</p>
-            <h2 id="ending-title">Título do Final</h2>
-            <p id="ending-text">Texto do final.</p>
-            <p id="ending-new-badge" class="ending-new hidden">Novo troféu desbloqueado!</p>
-            <div class="ending-actions">
-                <button id="btn-play-again" class="btn btn-primary">Jogar Novamente</button>
-                <button id="btn-ending-trophies" class="btn btn-secondary">Ver Troféus</button>
-                <button id="btn-ending-menu" class="btn btn-tertiary">Menu Principal</button>
-            </div>
-        </div>
-    </section>
-
-    <script src="JS/script.js"></script>
+  <script src="JS/script.js"></script>
 </body>
 </html>
