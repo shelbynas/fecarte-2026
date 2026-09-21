@@ -98,6 +98,25 @@
   opacity: 0.6;
 }
 
+.choice-btn.btn-home-menu {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  margin-top: 10px;
+  background-color: #101014;
+  border-color: var(--text-amber);
+  color: var(--text-amber);
+  font-family: var(--font-mono);
+}
+
+.choice-btn.btn-home-menu:hover {
+  background-color: var(--text-amber);
+  color: #101014;
+  border-color: var(--text-amber);
+  transform: none;
+  box-shadow: none;
+}
+
 .padlock-container {
   background-color: #0c0c10;
   border: 2px solid var(--text-amber);

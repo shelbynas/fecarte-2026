@@ -104,11 +104,23 @@ class UIController {
 
     this.typeText(chapterNode.texto, () => {
       this.renderButtons(chapterNode.botoes, onChoiceClick);
+      if (chapterNode.isEnding) {
+        this.renderHomeButton();
+      }
     });
 
     if (chapterNode.isEnding && chapterNode.endingId) {
       achievementsManager.unlockEnding(chapterNode.endingId);
     }
+  }
+
+  renderHomeButton() {
+    const buttonsEl = document.getElementById("choice-buttons");
+    const btn = document.createElement("a");
+    btn.href = "../index.html";
+    btn.className = "choice-btn btn-home-menu";
+    btn.textContent = "🏠 Voltar ao Menu Inicial";
+    buttonsEl.appendChild(btn);
   }
 
   typeText(fullText, callback) {
