@@ -1,13 +1,11 @@
 /* ================================================================
    VOCÊ SOBREVIVERIA? — CRYSTAL LAKE
    Versão revisada: UX, progressão, finais, troféus persistentes,
-   sistema de som e botão de voltar ao início.
+   sistema de som, botão de voltar ao início e pressão de perseguição.
    ================================================================ */
 
 /* ----------------------------------------------------------------
    ÁUDIO
-   Coloque os arquivos correspondentes em /audio/. Se um arquivo
-   não existir, o som simplesmente não toca — nada quebra.
    ---------------------------------------------------------------- */
 const AudioManager = (() => {
   let muted = localStorage.getItem("crystalLakeMuted") === "true";
@@ -67,6 +65,12 @@ const ENDINGS = {
   ending_heroic: { name: "Resgate Estadual", description: "Conseguiu pedir socorro.", icon: "📻" }
 };
 
+/* Cenas de "loop de fuga": cada vez que o jogador cai de novo numa
+   dessas por falhar um teste, Jason está mais perto — dano automático
+   crescente. Isso garante que ficar preso no loop floresta/torre/lago
+   tem um custo real e o final de morte é alcançável. */
+const CHASE_LOOP_SCENES = ["forest_chase", "tower_escape", "garage_escape", "lake_escape"];
+
 const gameState = {
   hp: 10, maxHp: 10,
   stamina: 5, maxStamina: 5,
@@ -74,7 +78,8 @@ const gameState = {
   currentScene: "prologue",
   decisions: 0,
   isRolling: false,
-  visited: new Set()
+  visited: new Set(),
+  chaseLoops: 0
 };
 
 const faceRotations = {
@@ -167,10 +172,19 @@ function rollD6Value() { return Math.floor(Math.random() * 6) + 1; }
 function handleDiceTest({ bonus = 0, target, statusMsg, onSuccess, onFail }) {
   if (gameState.isRolling) return;
   gameState.isRolling = true;
+  
   const stage = document.getElementById("dice-stage");
   const cube = document.getElementById("cube");
   const status = document.getElementById("dice-status");
+  const hint = document.getElementById("dice-hint");
+  const continueBtn = document.getElementById("dice-continue");
+
   status.innerText = statusMsg || "O DADO ESTÁ ROLANDO...";
+  
+  // Reseta visibilidade da dica e do botão para o momento do giro
+  if (hint) hint.classList.remove("hidden");
+  if (continueBtn) continueBtn.classList.add("hidden");
+
   stage.classList.remove("hidden");
   cube.classList.add("rolling");
   AudioManager.play("dice");
@@ -186,12 +200,34 @@ function handleDiceTest({ bonus = 0, target, statusMsg, onSuccess, onFail }) {
     status.innerText = `DADO: ${roll}${bonus ? ` + ${bonus}` : ""}  •  TOTAL: ${total}  •  ${success ? "SUCESSO" : "FALHA"}`;
     AudioManager.play(success ? "success" : "fail");
 
-    setTimeout(() => {
-      stage.classList.add("hidden");
-      gameState.isRolling = false;
-      showMessage(success ? `Teste bem-sucedido! Você tirou ${roll}.` : `Teste falhou. Você tirou ${roll}.`);
-      if (success) onSuccess?.(); else onFail?.();
-    }, 850);
+    // Oculta a dica e revela o botão para o jogador decidir quando prosseguir
+    if (hint) hint.classList.add("hidden");
+    if (continueBtn) {
+        continueBtn.classList.remove("hidden");
+        continueBtn.focus();
+    }
+
+    const finishRoll = () => {
+        stage.classList.add("hidden");
+        gameState.isRolling = false;
+        showMessage(success ? `Teste bem-sucedido! Você tirou ${roll}.` : `Teste falhou. Você tirou ${roll}.`);
+        
+        if (continueBtn) continueBtn.removeEventListener("click", finishRoll);
+        document.removeEventListener("keydown", handleEnter);
+
+        if (success) onSuccess?.(); else onFail?.();
+    };
+
+    const handleEnter = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            finishRoll();
+        }
+    };
+
+    if (continueBtn) continueBtn.addEventListener("click", finishRoll);
+    document.addEventListener("keydown", handleEnter);
+
   }, 1900);
 }
 
@@ -205,13 +241,13 @@ function updateHUD() {
   document.getElementById("progress-text").innerText = `Decisões: ${gameState.decisions}`;
 }
 
-/* ========================= ROTEIRO (Extensões Corrigidas) ========================= */
+/* ========================= ROTEIRO ========================= */
 const scenes = {
   prologue: {
     chapter: "PRÓLOGO", title: "A estrada para Crystal Lake", image: "img/prologue-road.mp4",
     text: "É sexta-feira, 13 de julho de 1984. Uma tempestade derruba a visibilidade enquanto seu carro para numa estrada isolada.\n\nUm letreiro enferrujado indica Crystal Lake. O acampamento deveria estar fechado há décadas, mas uma luz aparece entre as árvores.\n\nÀ esquerda, um posto abandonado. À frente, os portões do acampamento.",
     choices: [
-      { text: "Investigar o posto em busca de recursos", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "VASculhando o posto abandonado...", onSuccess: () => { addItem("Lanterna"); goToScene("gas_station"); }, onFail: () => { takeDamage(1); goToScene("gas_station"); } }) },
+      { text: "Investigar o posto em busca de recursos", action: () => handleDiceTest({ target: 3, statusMsg: "VASculhando o posto abandonado...", onSuccess: () => { addItem("Lanterna"); goToScene("gas_station"); }, onFail: () => { takeDamage(1); goToScene("gas_station"); } }) },
       { text: "Deixar o carro e seguir direto para o acampamento", action: () => goToScene("arrival") }
     ]
   },
@@ -223,10 +259,10 @@ const scenes = {
     ]
   },
   arrival: {
-    chapter: "CAPÍTULO I", title: "Os portões de Crystal Lake", image: "img/camp_gates.jpg", text: "Os portões estão abertos. A corrente foi cortada recentemente. No pátio existem cabanas, uma trilha para a torre de vigia e outra para o lago.\n\nVocê escuta um barulho metálico vindo de uma das cabanas.",
+    chapter: "CAPÍTULO I", title: "Os portões de Crystal Lake", image: "img/camp_gates.mp4", text: "Os portões estão abertos. A corrente foi cortada recentemente. No pátio existem cabanas, uma trilha para a torre de vigia e outra para o lago.\n\nVocê escuta um barulho metálico vindo de uma das cabanas.",
     choices: [
       { reqItem: "Pé de Cabra", text: "Usar o Pé de Cabra para entrar na cabana principal", tag: "ITEM", action: () => goToScene("cabin_inside") },
-      { text: "Entrar na cabana pela força", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, statusMsg: "FORÇANDO A PORTA...", onSuccess: () => goToScene("cabin_inside"), onFail: () => { takeDamage(2); recoverStamina(1); goToScene("arrival"); } }) },
+      { text: "Entrar na cabana pela força", tag: "TESTE DE FORÇA", action: () => handleDiceTest({ target: 4, statusMsg: "FORÇANDO A PORTA...", onSuccess: () => goToScene("cabin_inside"), onFail: () => { takeDamage(3); recoverStamina(1); goToScene("arrival"); } }) },
       { text: "Seguir pela trilha até a torre de vigia", action: () => goToScene("watchtower_path") },
       { text: "Descer até o cais do lago", action: () => goToScene("lake_trail") }
     ]
@@ -237,14 +273,14 @@ const scenes = {
       { showIf: () => !hasItem("Kit Médico"), text: "Pegar o Kit Médico e correr", action: () => { if (addItem("Kit Médico")) goToScene("forest_chase"); } },
       { reqItem: "Lanterna", text: "Apontar a Lanterna e ganhar tempo para fugir", tag: "ITEM", action: () => { removeItem("Lanterna"); goToScene("forest_chase"); } },
       { text: "Subir para o sótão", action: () => goToScene("cabin_attic") },
-      { text: "Tentar escapar pela porta da frente", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "ESCAPANDO DA CABANA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
+      { text: "Tentar escapar pela porta da frente", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "ESCAPANDO DA CABANA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(3); goToScene("forest_chase"); } }) }
     ]
   },
   cabin_attic: {
     chapter: "CAPÍTULO II", title: "O sótão", image: "img/cabin_attic.png", sting: "piorCena", text: "Você se esconde no sótão. Caixas antigas ocupam o espaço. Uma delas contém um sinalizador de emergência.\n\nAs tábuas abaixo começam a ranger. Jason está subindo.",
     choices: [
-      { showIf: () => !hasItem("Sinalizador"), text: "Abrir a caixa metálica", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 3, statusMsg: "ABRINDO O FECHO...", onSuccess: () => { addItem("Sinalizador"); goToScene("forest_chase"); }, onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) },
-      { text: "Saltar pela janela para a mata", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "SALTANDO PELA JANELA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(2); goToScene("forest_chase"); } }) }
+      { showIf: () => !hasItem("Sinalizador"), text: "Abrir a caixa metálica", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 3, statusMsg: "ABRINDO O FECHO...", onSuccess: () => { addItem("Sinalizador"); goToScene("forest_chase"); }, onFail: () => { takeDamage(3); goToScene("forest_chase"); } }) },
+      { text: "Saltar pela janela para a mata", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "SALTANDO PELA JANELA...", onSuccess: () => goToScene("forest_chase"), onFail: () => { takeDamage(3); goToScene("forest_chase"); } }) }
     ]
   },
   forest_chase: {
@@ -256,20 +292,20 @@ const scenes = {
     ]
   },
   garage_scene: {
-    chapter: "CAPÍTULO IV", title: "O galpão dos veículos", image: "img/garage.png", sting: "piorCena", text: () => hasItem("Chave da Pick-Up") ? "A Pick-Up de resgate ainda está na garagem. Você encontrou a chave no quadro da oficina.\n\nJason está cada vez mais perto. Agora basta ligar o veículo e fugir." : "A garagem está escura. Uma Pick-Up de resgate ainda parece utilizável, mas a chave não está no contato.\n\nJason se aproxima pelo corredor. Você precisa decidir se procura a chave ou tenta ligar o veículo por conta própria.",
+    chapter: "CAPÍTULO IV", title: "O galpão dos veículos", image: "img/garage.mp4", sting: "piorCena", text: () => hasItem("Chave da Pick-Up") ? "A Pick-Up de resgate ainda está na garagem. Você encontrou a chave no quadro da oficina.\n\nJason está cada vez mais perto. Agora basta ligar o veículo e fugir." : "A garagem está escura. Uma Pick-Up de resgate ainda parece utilizável, mas a chave não está no contato.\n\nJason se aproxima pelo corredor. Você precisa decidir se procura a chave ou tenta ligar o veículo por conta própria.",
     choices: [
       { reqItem: "Chave da Pick-Up", text: "Usar a chave e ligar a Pick-Up", tag: "ITEM", action: () => goToScene("ending_good_car") },
       { showIf: () => !hasItem("Chave da Pick-Up"), text: "Procurar a chave no quadro da oficina", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 3, statusMsg: "PROCURANDO A CHAVE...", onSuccess: () => {
           if (addItem("Chave da Pick-Up")) goToScene("garage_scene");
           else goToScene("garage_escape");
-        }, onFail: () => { useStamina(1); goToScene("garage_escape"); } }) },
-      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Tentar ligar a Pick-Up sem a chave", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 5, statusMsg: "TENTANDO DAR PARTIDA...", onSuccess: () => goToScene("ending_good_car"), onFail: () => { takeDamage(2); goToScene("garage_escape"); } }) }
+        }, onFail: () => { useStamina(1); takeDamage(1); goToScene("garage_escape"); } }) },
+      { showIf: () => !hasItem("Chave da Pick-Up"), text: "Tentar ligar a Pick-Up sem a chave", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 5, statusMsg: "TENTANDO DAR PARTIDA...", onSuccess: () => goToScene("ending_good_car"), onFail: () => { takeDamage(3); goToScene("garage_escape"); } }) }
     ]
   },
   garage_escape: {
     chapter: "CAPÍTULO IV", title: "Sem tempo para tentar de novo", image: "img/forest-chase.mp4", sting: "piorCena", text: "O barulho chamou atenção. Jason já está entrando na garagem. A Pick-Up não é mais uma opção segura, mas talvez dê pra voltar mais tarde.\n\nVocê corre por uma porta lateral e volta para a trilha.",
     choices: [
-      { text: "Voltar e arriscar a garagem de novo", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 4, statusMsg: "ESPERANDO UMA BRECHA...", onSuccess: () => goToScene("garage_scene"), onFail: () => { takeDamage(1); goToScene("watchtower_path"); } }) },
+      { text: "Voltar e arriscar a garagem de novo", tag: "TESTE DE SORTE", action: () => handleDiceTest({ target: 4, statusMsg: "ESPERANDO UMA BRECHA...", onSuccess: () => goToScene("garage_scene"), onFail: () => { takeDamage(2); goToScene("watchtower_path"); } }) },
       { text: "Correr para a torre de vigia", action: () => goToScene("watchtower_path") },
       { text: "Correr para o lago", action: () => goToScene("lake_trail") }
     ]
@@ -277,7 +313,7 @@ const scenes = {
   watchtower_path: {
     chapter: "CAPÍTULO IV", title: "A torre de vigia", image: "img/watchtower.mp4", text: "No alto da torre existe um rádio de emergência. A energia está instável, mas a antena ainda aponta para a estrada estadual.\n\nUm sinalizador também poderia chamar atenção de quem estiver passando pela região.",
     choices: [
-      { text: "Tentar transmitir um pedido de socorro", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "BUSCANDO A FREQUÊNCIA...", onSuccess: () => goToScene("ending_heroic"), onFail: () => { takeDamage(1); goToScene("tower_escape"); } }) },
+      { text: "Tentar transmitir um pedido de socorro", tag: "TESTE DE HABILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "BUSCANDO A FREQUÊNCIA...", onSuccess: () => goToScene("ending_heroic"), onFail: () => { takeDamage(2); goToScene("tower_escape"); } }) },
       { reqItem: "Sinalizador", text: "Disparar o sinalizador para a estrada", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
       { text: "Descer para a garagem", action: () => goToScene("garage_scene") },
       { text: "Descer e procurar o lago", action: () => goToScene("lake_trail") }
@@ -293,7 +329,7 @@ const scenes = {
   lake_trail: {
     chapter: "CAPÍTULO IV", title: "As águas de Crystal Lake", image: "img/lake.mp4", text: "O cais está escorregadio e a chuva transforma o lago em uma massa escura. Uma pequena lancha de manutenção está presa à margem.\n\nVocê ouve passos atrás de si. Não há muito tempo.",
     choices: [
-      { text: "Tentar ligar o motor da lancha", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "PUXANDO O MOTOR...", onSuccess: () => goToScene("ending_good_boat"), onFail: () => { takeDamage(2); goToScene("lake_escape"); } }) },
+      { text: "Tentar ligar o motor da lancha", tag: "TESTE DE AGILIDADE", action: () => handleDiceTest({ target: 4, statusMsg: "PUXANDO O MOTOR...", onSuccess: () => goToScene("ending_good_boat"), onFail: () => { takeDamage(3); goToScene("lake_escape"); } }) },
       { reqItem: "Sinalizador", text: "Usar o sinalizador para chamar ajuda", tag: "ITEM", action: () => { removeItem("Sinalizador"); goToScene("ending_heroic"); } },
       { text: "Correr para a garagem", action: () => goToScene("garage_scene") },
       { text: "Abandonar o cais e procurar a torre", action: () => goToScene("watchtower_path") }
@@ -320,13 +356,21 @@ function goToScene(sceneKey) {
   if (scene.ending) saveTrophy(sceneKey);
   if (scene.sting) AudioManager.play(scene.sting);
 
+  // Pressão de perseguição: cada vez que o jogador retorna a uma cena
+  // de loop de fuga, Jason está mais perto — dano automático crescente.
+  if (!scene.ending && CHASE_LOOP_SCENES.includes(sceneKey)) {
+    gameState.chaseLoops++;
+    if (gameState.chaseLoops > 1) {
+      const pressureDamage = Math.min(1 + Math.floor(gameState.chaseLoops / 3), 3);
+      takeDamage(pressureDamage);
+      if (gameState.hp > 0) showMessage("Jason está cada vez mais perto...");
+    }
+  }
+
   document.getElementById("chapter-badge").innerText = scene.chapter;
   document.getElementById("scene-title").innerText = scene.title;
   document.getElementById("scene-text").innerText = typeof scene.text === "function" ? scene.text() : scene.text;
 
-  // Aceita as duas mídias: se o arquivo da cena for .mp4/.webm/.mov, usa
-  // vídeo em loop; qualquer outra extensão (.png/.jpg/etc.) usa imagem.
-  // Assim você pode ir trocando cena por cena, no seu ritmo.
   const img = document.getElementById("scene-image");
   const video = document.getElementById("scene-video");
   const placeholder = document.getElementById("image-placeholder");
@@ -396,37 +440,37 @@ function restartGame() {
   gameState.decisions = 0;
   gameState.isRolling = false;
   gameState.visited.clear();
+  gameState.chaseLoops = 0;
   hideMessage();
-  updateHUD();
   goToScene("prologue");
 }
 
-function confirmRestart() {
-  if (gameState.decisions === 0) { restartGame(); return; }
-  if (confirm("Voltar ao início vai reiniciar sua run atual. Continuar?")) {
-    restartGame();
-  }
-}
-
-function openTrophies() { updateTrophyUI(); document.getElementById("trophy-modal").classList.remove("hidden"); }
-function closeTrophies() { document.getElementById("trophy-modal").classList.add("hidden"); }
-
+/* ==========================================================================
+   INICIALIZAÇÃO & EVENTOS
+   ========================================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("trophy-button").onclick = openTrophies;
-  document.getElementById("close-trophy").onclick = closeTrophies;
-  document.getElementById("trophy-modal").addEventListener("click", e => { if (e.target.id === "trophy-modal") closeTrophies(); });
-  document.getElementById("restart-button").onclick = confirmRestart;
-  document.getElementById("sound-toggle").onclick = () => AudioManager.toggleMute();
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeTrophies(); });
-
-  // A maioria dos navegadores só libera áudio após uma interação do usuário.
-  document.addEventListener("click", function startAudioOnce() {
-    AudioManager.startBgm();
-    document.removeEventListener("click", startAudioOnce);
-  }, { once: true });
-
   AudioManager.applyMuteState();
+  
+  const startInteraction = () => {
+    AudioManager.startBgm();
+    document.removeEventListener("click", startInteraction);
+    document.removeEventListener("keydown", startInteraction);
+  };
+  document.addEventListener("click", startInteraction, { once: true });
+  document.addEventListener("keydown", startInteraction, { once: true });
+
+  document.getElementById("sound-toggle")?.addEventListener("click", () => AudioManager.toggleMute());
+  document.getElementById("restart-button")?.addEventListener("click", () => {
+    if (confirm("Tem certeza que deseja recomeçar sua jornada em Crystal Lake? Seu progresso atual será perdido.")) restartGame();
+  });
+  const trophyModal = document.getElementById("trophy-modal");
+  document.getElementById("trophy-button")?.addEventListener("click", () => {
+    updateTrophyUI();
+    trophyModal.classList.remove("hidden");
+  });
+  document.getElementById("close-trophy")?.addEventListener("click", () => trophyModal.classList.add("hidden"));
+  trophyModal?.addEventListener("click", e => { if (e.target === trophyModal) trophyModal.classList.add("hidden"); });
+
   updateTrophyUI();
-  updateHUD();
-  goToScene("prologue");
-});
+  restartGame();
+}); 
