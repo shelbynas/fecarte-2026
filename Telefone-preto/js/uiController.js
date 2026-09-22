@@ -102,11 +102,14 @@ class UIController {
       padlockBox.classList.add("hidden");
     }
 
+    if (window.narrator) narrator.stop();
+
     this.typeText(chapterNode.texto, () => {
       this.renderButtons(chapterNode.botoes, onChoiceClick);
       if (chapterNode.isEnding) {
         this.renderHomeButton();
       }
+      if (window.narrator) narrator.narrateChapterText(chapterNode.texto);
     });
 
     if (chapterNode.isEnding && chapterNode.endingId) {
