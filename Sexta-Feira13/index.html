@@ -15,9 +15,6 @@
 <body>
   <div id="scanlines" aria-hidden="true"></div>
 
-  <!-- Fundo cinematográfico: cobre 100% da viewport, fixo, atrás de tudo.
-       Antes vivia dentro do #narrative-box (caixa com borda); agora é o
-       cenário inteiro da tela, sempre visível mesmo com a página rolando. -->
   <div id="scene-image-container" aria-hidden="true">
     <img id="scene-image" src="" alt="" class="hidden">
     <video id="scene-video" class="hidden" autoplay loop muted playsinline></video>
@@ -59,8 +56,6 @@
     </header>
 
     <main id="main-content">
-      <!-- Antes era uma barra cheia acima da imagem; agora é uma etiqueta
-           discreta flutuando no canto, sem tirar espaço da cena. -->
       <div class="progress-row">
         <span id="chapter-badge" class="badge">PRÓLOGO</span>
         <span id="progress-text">Decisões: 0</span>
@@ -105,7 +100,8 @@
           <div class="face face-6"><span class="pip top-left"></span><span class="pip top-right"></span><span class="pip mid-left"></span><span class="pip mid-right"></span><span class="pip bottom-left"></span><span class="pip bottom-right"></span></div>
         </div>
       </div>
-      <div class="dice-hint">D6 • cada resultado muda seu destino</div>
+      <div id="dice-hint" class="dice-hint">D6 • cada resultado muda seu destino</div>
+      <button id="dice-continue" class="btn-choice hidden" type="button">Continuar</button>
     </div>
   </section>
 
