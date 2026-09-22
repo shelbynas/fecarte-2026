@@ -69,10 +69,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   FUNDO CINEMATOGRÁFICO — cobre 100% da viewport, sempre, atrás de tudo.
-   Antes essa imagem vivia dentro do painel #narrative-box (uma caixa com
-   borda). Agora ela É a cena: fixa, tela cheia, com respiro (Ken Burns) e
-   crossfade entre uma cena e outra.
+   FUNDO CINEMATOGRÁFICO
    ========================================================================== */
 #scene-image-container {
     position: fixed;
@@ -98,7 +95,6 @@ a:focus-visible {
     transition: opacity 0.7s ease;
 }
 
-/* Ken Burns (zoom lento) só na imagem estática — o vídeo já tem movimento próprio */
 #scene-image {
     animation: kenburns 22s ease-in-out infinite alternate;
     transform-origin: center;
@@ -114,8 +110,6 @@ a:focus-visible {
     #scene-image { animation: none; }
 }
 
-/* Vinheta: escurece o topo (legibilidade do HUD) e a base (legibilidade
-   do texto/escolhas), mantendo o centro da imagem limpo e visível. */
 .scene-vignette {
     position: absolute;
     inset: 0;
@@ -127,7 +121,6 @@ a:focus-visible {
         linear-gradient(0deg, rgba(5, 4, 7, 0.97) 0%, rgba(5, 4, 7, 0.68) 26%, rgba(5, 4, 7, 0) 58%);
 }
 
-/* Cantos de "visor de câmera" — acento decorativo sobre o fundo fixo */
 #scene-image-container::before,
 #scene-image-container::after {
     content: "";
@@ -193,7 +186,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   ESTRUTURA GERAL — o jogo inteiro flutua sobre o fundo fixo
+   ESTRUTURA GERAL
    ========================================================================== */
 #game-container {
     position: relative;
@@ -204,7 +197,6 @@ a:focus-visible {
     background: transparent;
 }
 
-/* HUD: painel de vidro flutuante, gruda no topo ao rolar, sem barra opaca */
 #hud {
     position: sticky;
     top: 0;
@@ -337,7 +329,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   ÁREA DE JOGO — texto e escolhas flutuam sobre o fundo, ancorados na base
+   ÁREA DE JOGO
    ========================================================================== */
 #main-content {
     flex: 1;
@@ -346,12 +338,10 @@ a:focus-visible {
     justify-content: flex-end;
     align-items: center;
     padding: 20px 24px 10vh;
-    gap: 20px;
+    gap: 40px;
     position: relative;
 }
 
-/* Antes era uma barra cheia acima da imagem; agora é uma etiqueta discreta
-   flutuando no canto superior, sem tirar espaço da cena. */
 .progress-row {
     position: absolute;
     top: 14px;
@@ -388,7 +378,7 @@ a:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 22px;
     width: 100%;
     max-width: 680px;
     margin: 0 auto;
@@ -399,7 +389,7 @@ a:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 10px;
 }
 
 .scene-eyebrow {
@@ -421,11 +411,12 @@ a:focus-visible {
 }
 
 #scene-text {
-    line-height: 1.55;
+    line-height: 1.75;
     color: var(--ink);
     font-size: 0.85rem;
     white-space: pre-line;
     max-width: 58ch;
+    margin-bottom: 4px;
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.9);
 }
 
@@ -441,7 +432,6 @@ a:focus-visible {
     font-size: 0.88rem;
 }
 
-/* Transição orquestrada ao trocar de cena */
 .narrative-enter .scene-heading,
 .narrative-enter #scene-text {
     animation: sceneReveal 0.5s ease both;
@@ -454,7 +444,7 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   DADO 3D
+   DADO 3D (REVISADO)
    ========================================================================== */
 #dice-stage {
     position: fixed;
@@ -472,18 +462,29 @@ a:focus-visible {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: var(--panel);
+    background: rgba(15, 10, 10, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--blood);
     padding: 36px 52px;
     box-shadow: 0 0 40px rgba(156, 27, 36, 0.45);
     border-radius: var(--radius-md);
+    gap: 16px;
+}
+
+.dice-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
 }
 
 .scene-3d {
     width: 90px;
     height: 90px;
     perspective: 600px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .cube {
@@ -551,11 +552,25 @@ a:focus-visible {
     font-size: 0.92rem;
     font-weight: 700;
     letter-spacing: 1.5px;
-    text-align: center;
+}
+
+.dice-hint {
+    color: var(--ink-dim);
+    font-size: 0.75rem;
+}
+
+#dice-continue {
+    min-width: 140px;
+    justify-content: center;
+    border-color: var(--amber);
+    color: var(--amber);
+}
+#dice-continue:hover {
+    background: rgba(217, 164, 65, 0.15);
 }
 
 /* ==========================================================================
-   ESCOLHAS — vidro translúcido sobre a cena, não mais um painel opaco
+   ESCOLHAS
    ========================================================================== */
 #choices-section {
     position: relative;
@@ -566,7 +581,7 @@ a:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 18px;
     text-align: center;
 }
 
@@ -574,11 +589,12 @@ a:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
     color: var(--ink-dim);
-    font-size: 0.66rem;
+    font-size: 0.85rem;
     letter-spacing: 1px;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+    margin-bottom: 4px;
 }
 
 .choices-heading span {
@@ -588,10 +604,16 @@ a:focus-visible {
     letter-spacing: 1.5px;
 }
 
+.choices-heading small {
+    font-size: 0.8rem;
+    color: #c7bfb6;
+    letter-spacing: 0.3px;
+}
+
 #choices-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     flex-shrink: 0;
 }
 
@@ -604,14 +626,14 @@ a:focus-visible {
     padding: 11px 16px;
     font-family: inherit;
     font-size: 0.85rem;
-    text-align: center;
     transition: all 0.15s ease;
-    display: flex;
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     border-radius: var(--radius-sm);
     min-height: 44px;
+    text-align: left;
 }
 
 .btn-choice:hover:not(:disabled) {
@@ -626,6 +648,16 @@ a:focus-visible {
 .btn-choice:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+.choice-number {
+    color: var(--amber);
+    font-weight: 700;
+    text-align: left;
+}
+
+.choice-content {
+    text-align: center;
 }
 
 .btn-tag {
@@ -797,7 +829,9 @@ a:focus-visible {
     .bar-container { width: 54px; }
     .hud-actions { gap: 6px; }
     #restart-button span { display: none; }
-    #main-content { padding: 16px 14px 14vh; gap: 14px; }
+    #main-content { padding: 16px 14px 14vh; gap: 28px; }
+    #narrative-box { gap: 16px; }
+    #choices-section { gap: 14px; }
     .progress-row { top: 10px; left: 0; }
     .progress-row .badge, #progress-text { font-size: 0.6rem; padding: 3px 8px; }
     #scene-title { font-size: 1.05rem; }
